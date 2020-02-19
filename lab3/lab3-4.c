@@ -82,48 +82,15 @@ vec3 lightSourcesDirectionsPositions[] = { {10.0f, 5.0f, 0.0f}, // Red light, po
 
                                        {0.0f, 0.0f, -1.0f} }; // White light along Z
 
-GLfloat specularExponent[] = {100.0, 200.0, 60.0, 50.0, 300.0, 150.0};
+GLfloat specularExponent[] = {100.0, 200.0, 60.0, 250.0, 300.0, 150.0};
 //______________
 
 float angle = 0;
+float phi = M_PI/2;
 vec3 p = {10, 8, 10};
 vec3 l = {0,8,0};
 vec3 v = {0,1,0};
 float distance = 0;
-
-void OnTimer(int value)
-{
-
-    glutPostRedisplay();
-		void LoadTGATextureSimple(char *filename, GLuint *tex);
-
-		if (glutKeyIsDown('s'))
-		{
-			vec3 a = VectorSub(p, l);
-			p = VectorAdd(p, Normalize(a));
-		}
-		if (glutKeyIsDown('w'))
-		{
-			vec3 a = VectorSub(p, l);
-			p = VectorSub(p, Normalize(a));
-		}
-		if (glutKeyIsDown('a'))
-		{
-			distance = Norm(VectorSub(p,l));
-			angle -= M_PI/50;
-		}
-		if (glutKeyIsDown('d'))
-		{
-			distance = Norm(VectorSub(p,l));
-			angle += M_PI/50;
-		}
-		l.x = p.x + cos(angle);
-		l.z = p.z + sin(angle);
-
-
-    glutTimerFunc(20, &OnTimer, value);
-
-}
 
 
 
@@ -152,8 +119,68 @@ mat4 rot1, rot2, trans, total, wtvMatrix, commonBladeRot, worldToViewMatrix, mod
 mat4 camRot;
 mat4 skyMatrix;
 
+int prevx = 0, prevy = 0;
+void mouseDragged(int x, int y)
+{
+	float diffx = x - (glutGet(GLUT_WINDOW_WIDTH)/2);
+	// This is a simple and IMHO really nice trackball system:
+	// You must have two things, the worldToViewMatrix and the modelToWorldMatrix
+	// (and the latter is modified).
+	if (diffx > 0)
+	{
+		angle += M_PI/200;
+	}
+	else if (diffx < 0)
+	{
+		angle -= M_PI/200;
+	}
+	// Use the movement direction to create an orthogonal rotation axis
+	// Transform the view coordinate rotation axis to world coordinates!
+
+
+	prevx = x;
+	prevy = y;
+}
+
+vec3 side_movement = {0,0,0};
+void OnTimer(int value)
+{
+
+		glutPassiveMotionFunc(mouseDragged);
+    glutPostRedisplay();
+		void LoadTGATextureSimple(char *filename, GLuint *tex);
+		side_movement = Normalize(CrossProduct(VectorSub(p,l),v));
+		if (glutKeyIsDown('s'))
+		{
+			vec3 a = VectorSub(p, l);
+			p = VectorAdd(p, Normalize(a));
+		}
+		if (glutKeyIsDown('w'))
+		{
+			vec3 a = VectorSub(p, l);
+			p = VectorSub(p, Normalize(a));
+		}
+		if (glutKeyIsDown('a'))
+		{
+			l = VectorAdd(l,side_movement);
+			p = VectorAdd(p,side_movement);
+		}
+		if (glutKeyIsDown('d'))
+		{
+			l = VectorSub(l,side_movement);
+			p = VectorSub(p,side_movement);
+		}
+		l.x = p.x + cos(angle);
+		l.z = p.z + sin(angle);
+		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH)/ 2,glutGet(GLUT_WINDOW_HEIGHT)/ 2);
+    glutTimerFunc(20, &OnTimer, value);
+
+}
+
+
 void init(void)
 {
+	glutHideCursor();
 	m = LoadModelPlus("windmill/windmill-walls.obj");
 	m2 = LoadModelPlus("windmill/windmill-balcony.obj");
 	m3 = LoadModelPlus("windmill/windmill-roof.obj");
@@ -164,7 +191,6 @@ void init(void)
 	ground = LoadModelPlus("ground.obj");
 	skybox = LoadModelPlus("skybox.obj");
 	dumpInfo();
-
 	// GL inits
 	glClearColor(0.859,0.957,0.998,1);
 	//glClearColor(0.396,0.486,0.314,1);
@@ -302,8 +328,6 @@ glUniform3f(glGetUniformLocation(program, "camPos"), p.x, p.y, p.z);
 
 	glutSwapBuffers();
 }
-
-int prevx = 0, prevy = 0;
 
 
 int main(int argc, char *argv[])

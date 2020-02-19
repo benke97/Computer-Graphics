@@ -17,7 +17,7 @@ uniform bool isDirectional[4];
 
 void main(void)
 {
-	vec3 ambient = vec3(0.1,0.1,0.1);
+	vec3 ambient = vec3(0.2,0.2,0.2);
 	float shade = 0.0f;
 	vec3 color = vec3(0,0,0);
 	vec3 totcolor = vec3(0,0,0);
@@ -25,7 +25,7 @@ void main(void)
 
 	float specStrength = 0.5f;
 	float spec = 0.0f;
-	//totcolor += ambient;
+	totcolor += ambient;
 	for (int i = 0; i<= 3; i++)
 	{
 		if (isDirectional[i])
@@ -47,8 +47,8 @@ void main(void)
 		}
 
 		// Specular shade
-		vec3 r = reflect(-light, inNormal);
-		//vec3 r = 2*inNormal*dot(-light, inNormal) + light;
+		//vec3 r = reflect(-light, inNormal);
+		vec3 r = 2*inNormal*dot(light, inNormal) - light;
 		vec3 eyeDir = normalize(camPos-out_Position);
 		if ( dot(light, inNormal) > 0.0)
 		{
