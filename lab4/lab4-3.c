@@ -1,4 +1,4 @@
-// Lab 4, terrain generation
+// Lab 4, terrain generation :)
 
 #ifdef __APPLE__
 	#include <OpenGL/gl3.h>
