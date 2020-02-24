@@ -149,7 +149,7 @@ void OnTimer(int value)
 		glutPassiveMotionFunc(mouseDragged);
     glutPostRedisplay();
 		void LoadTGATextureSimple(char *filename, GLuint *tex);
-		side_movement = 0.1*Normalize(CrossProduct(VectorSub(p,l),v));
+		side_movement = Normalize(CrossProduct(VectorSub(p,l),v));
 		if (glutKeyIsDown('s'))
 		{
 			vec3 a = VectorSub(p, l);
