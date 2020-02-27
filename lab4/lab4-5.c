@@ -107,72 +107,116 @@ Model* GenerateTerrain(TextureData *tex)
 
 
 // vertex array object
-Model *m, *m2, *tm, *ball;
+Model *m, *m2, *tm, *ball, *skybox, *lake;
 // Reference to shader program
-GLuint program;
-GLuint tex1, tex2, balltex;
+GLuint program, skyboxshader, waterShader;
+GLuint tex1, tex2, balltex, dirttex, skyTex;
 TextureData ttex; // terrain
-mat4 Rot, Trans;
+mat4 Rot, Trans, skyMatrix;
 GLfloat t;
 void init(void)
 {
 	// GL inits
-	glClearColor(0.2,0.2,0.5,0);
+	glClearColor(0.859,0.957,0.998,1);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
-
+	skybox = LoadModelPlus("skybox.obj");
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 5000.0);
 	// Load and compile shader
-	program = loadShaders("terrain.vert", "terrain.frag");
+	program = loadShaders("terrain4-5.vert", "terrain4-5.frag");
+	skyboxshader = loadShaders("sb.vert", "sb.frag");
+	waterShader = loadShaders("water.vert", "water.frag");
+
 	glUseProgram(program);
 	printError("init shader");
-
 	ball = LoadModelPlus("groundsphere.obj");
+	lake = LoadModelPlus("ground.obj");
 	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
-	LoadTGATextureSimple("maskros512.tga", &tex1);
+	glUniform1i(glGetUniformLocation(program, "dirttex"), 1);
+	LoadTGATextureSimple("grass.tga", &tex1);
 	LoadTGATextureSimple("conc.tga", &balltex);
+	LoadTGATextureSimple("dirt.tga", &dirttex);
+	LoadTGATextureSimple("SkyBox512.tga", &skyTex);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, dirttex);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, skyTex);
 // Load terrain data
 
 	LoadTGATextureData("fft-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
 	printError("init terrain");
+
+	glUseProgram(skyboxshader);
+	glUniform1i(glGetUniformLocation(skyboxshader, "texUnit"), 2);
+	glUniformMatrix4fv(glGetUniformLocation(skyboxshader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
+	glEnableVertexAttribArray(glGetAttribLocation(skyboxshader, "projectionMatrix"));
+
+	glUseProgram(waterShader);
+	glUniformMatrix4fv(glGetUniformLocation(waterShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 }
 
 
-vec3 cam = {100,100, 100};
-vec3 lookAtPoint = {2, 0, 2};
+vec3 cam = {25,10, 100};
+vec3 lookAtPoint = {200, 20, 200};
 vec3 upVector = {0, 1, 0};
 void display(void)
 {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+	//GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
 	mat4 total, modelView, camMatrix;
 
-	printError("pre display");
-
-	glUseProgram(program);
-
-	// Build matrix
 	camMatrix = lookAt(cam.x, cam.y, cam.z,
 				lookAtPoint.x, lookAtPoint.y, lookAtPoint.z,
 				upVector.x, upVector.y, upVector.z);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
+
+	// ###### Skybox ###############
+	glUseProgram(skyboxshader);
+	skyMatrix = T(cam.x,cam.y,cam.z);
+	glDisable(GL_DEPTH_TEST);
+	glUniformMatrix4fv(glGetUniformLocation(skyboxshader, "wtvMatrix"), 1, GL_TRUE, total.m);
+	glUniformMatrix4fv(glGetUniformLocation(skyboxshader, "mdlMatrix"), 1, GL_TRUE, skyMatrix.m);
+	glBindTexture(GL_TEXTURE_2D, skyTex);
+	DrawModel(skybox, skyboxshader, "in_Position", NULL , "inTexCoord");
+	glEnable(GL_DEPTH_TEST);
+
+	printError("pre display");
+
+	// ###### TERRAIN #################
+	glUseProgram(program);
+	// Build matrix
+	modelView = IdentityMatrix();
+	total = Mult(camMatrix, modelView);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 
-	glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
+	//glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
 	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
 
-	Trans = T(cam.x + 10*cos(t/600), heightFinder(cam.x + 10*cos(t/600), cam.z + 10*sin(t/600)), cam.z + 10*sin(t/600));
-	total = Mult(camMatrix, Trans);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	glBindTexture(GL_TEXTURE_2D, balltex);		// Texture for ball
-	DrawModel(ball, program, "inPosition", "inNormal", "inTexCoord");
+	//Trans = T(cam.x + 10*cos(t/600), heightFinder(cam.x + 10*cos(t/600), cam.z + 10*sin(t/600)), cam.z + 10*sin(t/600));
+	//total = Mult(camMatrix, Trans);
+	//glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
+	//glBindTexture(GL_TEXTURE_2D, balltex);		// Texture for ball
+	//DrawModel(ball, program, "inPosition", "inNormal", "inTexCoord");
 	printError("display 2");
+
+	// ###### Water #################
+	glUseProgram(waterShader);
+	glUniform3f(glGetUniformLocation(waterShader, "camPos"), cam.x, cam.y, cam.z);
+	modelView = T(0,3.5,0);
+	total = Mult(camMatrix, modelView);
+	glUniformMatrix4fv(glGetUniformLocation(waterShader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	DrawModel(lake, waterShader, "inPosition", "inNormal", "inTexCoord");
+	glDisable(GL_BLEND);
 
 	glutSwapBuffers();
 }
