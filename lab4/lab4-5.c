@@ -60,19 +60,18 @@ Model* GenerateTerrain(TextureData *tex)
 	for (x = 0; x < tex->width; x++)
 		for (z = 0; z < tex->height; z++)
 		{
-			if (x == 0 || x == tex->width || z == 0 || z == tex->height)
+			if (x < 1 || x > tex->width - 1 || z < 1 || z > tex->height - 1)
 			{
-
+				normalArray[(x + z * tex->width)*3 + 0] = 0;
+				normalArray[(x + z * tex->width)*3 + 1] = 1;
+				normalArray[(x + z * tex->width)*3 + 2] = 0;
 			}
 			else
 			{
-				//vec3 P = {1.0,1.0,1.0};
-				vec3 N = {1.0,1.0,1.0};
-				//P.x = vertexArray[(x + z * tex->width)*3 + 0];
-				//P.y = vertexArray[(x + z * tex->width)*3 + 1];
-				//P.z = vertexArray[(x + z * tex->width)*3 + 2];
 
-	// read neightbor heights using an arbitrary small offset
+				vec3 N = {1.0,1.0,1.0};
+
+	// read neightbor heights
 				float heightNegZ = vertexArray[(x + (z-1) * tex->width)*3 + 1];
 				float heightPosZ = vertexArray[(x + (z+1) * tex->width)*3 + 1];
 				float heightNegX = vertexArray[((x-1) + z * tex->width)*3 + 1];
@@ -82,7 +81,7 @@ Model* GenerateTerrain(TextureData *tex)
 				N.x = heightNegX - heightPosX;
 				N.y = 2.0;
 				N = Normalize(N);
-	// Normal vectors. You need to calculate these.
+	// Normal vectors.
 				normalArray[(x + z * tex->width)*3 + 0] = N.x;
 				normalArray[(x + z * tex->width)*3 + 1] = N.y;
 				normalArray[(x + z * tex->width)*3 + 2] = N.z;
@@ -107,10 +106,10 @@ Model* GenerateTerrain(TextureData *tex)
 
 
 // vertex array object
-Model *m, *m2, *tm, *ball, *skybox, *lake;
+Model *m, *m2, *tm, *ball, *skybox, *lake, *lambo;
 // Reference to shader program
-GLuint program, skyboxshader, waterShader;
-GLuint tex1, tex2, balltex, dirttex, skyTex;
+GLuint program, skyboxshader, waterShader, lamboshader;
+GLuint tex1, tex2, balltex, dirttex, skyTex, lamboTex;
 TextureData ttex; // terrain
 mat4 Rot, Trans, skyMatrix;
 GLfloat t;
@@ -122,11 +121,13 @@ void init(void)
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
 	skybox = LoadModelPlus("skybox.obj");
+	lambo = LoadModelPlus("Lambo/Lamborghini_Aventador.obj");
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 5000.0);
 	// Load and compile shader
 	program = loadShaders("terrain4-5.vert", "terrain4-5.frag");
 	skyboxshader = loadShaders("sb.vert", "sb.frag");
 	waterShader = loadShaders("water.vert", "water.frag");
+	lamboshader = loadShaders("lambo.vert", "lambo.frag");
 
 	glUseProgram(program);
 	printError("init shader");
@@ -139,6 +140,7 @@ void init(void)
 	LoadTGATextureSimple("conc.tga", &balltex);
 	LoadTGATextureSimple("dirt.tga", &dirttex);
 	LoadTGATextureSimple("SkyBox512.tga", &skyTex);
+	LoadTGATextureSimple("Lambo/lambo2.tga", &lamboTex);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex1);
@@ -146,6 +148,8 @@ void init(void)
 	glBindTexture(GL_TEXTURE_2D, dirttex);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, skyTex);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, lamboTex);
 // Load terrain data
 
 	LoadTGATextureData("fft-terrain.tga", &ttex);
@@ -159,18 +163,25 @@ void init(void)
 
 	glUseProgram(waterShader);
 	glUniformMatrix4fv(glGetUniformLocation(waterShader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+
+	glUseProgram(lamboshader);
+	glUniform1i(glGetUniformLocation(lamboshader, "lamboTex"), 3);
+	glUniformMatrix4fv(glGetUniformLocation(lamboshader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 }
 
 
 vec3 cam = {25,10, 100};
 vec3 lookAtPoint = {200, 20, 200};
 vec3 upVector = {0, 1, 0};
+vec3 side_movement = {0,0,0};
+float angle = 0;
+float yangle = 0;
 void display(void)
 {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
-	mat4 total, modelView, camMatrix;
+	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+	mat4 total, modelView, camMatrix, scale, rot;
 
 	camMatrix = lookAt(cam.x, cam.y, cam.z,
 				lookAtPoint.x, lookAtPoint.y, lookAtPoint.z,
@@ -206,6 +217,18 @@ void display(void)
 	//glBindTexture(GL_TEXTURE_2D, balltex);		// Texture for ball
 	//DrawModel(ball, program, "inPosition", "inNormal", "inTexCoord");
 	printError("display 2");
+	glUseProgram(lamboshader);
+	glBindTexture(GL_TEXTURE_2D, lamboTex);
+	scale = S(0.005,0.005,0.005);
+	modelView = T(cam.x,heightFinder(cam.x,cam.z),cam.z);
+	//T(cam.x + 50*cos(t/800), heightFinder(cam.x + 50*cos(t/800), cam.z + 50*sin(t/800)), cam.z + 50*sin(t/800));
+	rot = Ry(-angle+M_PI/2);
+	modelView = Mult(modelView,scale);
+	modelView = Mult(modelView,rot);
+	total = Mult(camMatrix, modelView);
+	glUniformMatrix4fv(glGetUniformLocation(lamboshader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	// Bind Our Texture tex1
+	DrawModel(lambo, lamboshader, "inPosition", "inNormal", "inTexCoord");
 
 	// ###### Water #################
 	glUseProgram(waterShader);
@@ -225,9 +248,6 @@ void display(void)
 //########################################
 // ######## Declarations################
 // ########################################
-vec3 side_movement = {0,0,0};
-float angle = 0;
-float yangle = 0;
 //########################################
 // ########  ################
 // ########################################
