@@ -122,15 +122,15 @@ void init(void)
 	printError("GL inits");
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 5000.0);
 	// Load and compile shader
-	program = loadShaders("terrain4-5.vert", "terrain4-5.frag");
+	program = loadShaders("shaders/terrain4-5.vert", "shaders/terrain4-5.frag");
 
 	glUseProgram(program);
 	printError("init shader");
 	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
 	glUniform1i(glGetUniformLocation(program, "dirttex"), 1);
-	LoadTGATextureSimple("grass.tga", &tex1);
-	LoadTGATextureSimple("dirt.tga", &dirttex);
+	LoadTGATextureSimple("textures/grass.tga", &tex1);
+	LoadTGATextureSimple("textures/dirt.tga", &dirttex);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex1);
@@ -138,7 +138,7 @@ void init(void)
 	glBindTexture(GL_TEXTURE_2D, dirttex);
 // Load terrain data
 
-	LoadTGATextureData("fft-terrain.tga", &ttex);
+	LoadTGATextureData("textures/fft-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
 	printError("init terrain");
 }
