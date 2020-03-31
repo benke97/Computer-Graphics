@@ -1,146 +1,40 @@
-// Lab 4, terrain generation :)
-
-#ifdef __APPLE__
-	#include <OpenGL/gl3.h>
-	// Linking hint for Lightweight IDE
-	// uses framework Cocoa
-#endif
 #include "MicroGlut.h"
 #include "GL_utilities.h"
-#include "VectorUtils3.h"
-#include "loadobj.h"
-#include "LoadTGA.h"
 #include <math.h>
+#include "terrain.c"
 
+#include <stdio.h>
 mat4 projectionMatrix;
-float heightFinder(float xPos, float zPos);
-GLfloat *vertexArray;
-int texwidth;
-int texheight;
-Model* GenerateTerrain(TextureData *tex)
-{
-	int vertexCount = tex->width * tex->height;
-	int triangleCount = (tex->width-1) * (tex->height-1) * 2;
-	int x, z;
-	texwidth = tex->width;
-	texheight = tex->height;
-	vertexArray = malloc(sizeof(GLfloat) * 3 * vertexCount);
-	GLfloat *normalArray = malloc(sizeof(GLfloat) * 3 * vertexCount);
-	GLfloat *texCoordArray = malloc(sizeof(GLfloat) * 2 * vertexCount);
-	GLuint *indexArray = malloc(sizeof(GLuint) * triangleCount*3);
+float heightFinder(float xPos, float zPos, int texwith);
 
-	printf("bpp %d\n", tex->bpp);
-	for (x = 0; x < tex->width; x++)
-		for (z = 0; z < tex->height; z++)
-		{
-// Vertex array. You need to scale this properly
-			vertexArray[(x + z * tex->width)*3 + 0] = x /1.0;
-			vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)]/ 10.0;
-			vertexArray[(x + z * tex->width)*3 + 2] = z / 1.0;
-// Normal vectors. You need to calculate these.
-			normalArray[(x + z * tex->width)*3 + 0] = 0.0;
-			normalArray[(x + z * tex->width)*3 + 1] = 1.0;
-			normalArray[(x + z * tex->width)*3 + 2] = 0.0;
-// Texture coordinates. You may want to scale them.
-			texCoordArray[(x + z * tex->width)*2 + 0] = x; // (float)x / tex->width;
-			texCoordArray[(x + z * tex->width)*2 + 1] = z; // (float)z / tex->height;
-		}
-	for (x = 0; x < tex->width-1; x++)
-		for (z = 0; z < tex->height-1; z++)
-		{
-		// Triangle 1
-			indexArray[(x + z * (tex->width-1))*6 + 0] = x + z * tex->width;
-			indexArray[(x + z * (tex->width-1))*6 + 1] = x + (z+1) * tex->width;
-			indexArray[(x + z * (tex->width-1))*6 + 2] = x+1 + z * tex->width;
-		// Triangle 2
-			indexArray[(x + z * (tex->width-1))*6 + 3] = x+1 + z * tex->width;
-			indexArray[(x + z * (tex->width-1))*6 + 4] = x + (z+1) * tex->width;
-			indexArray[(x + z * (tex->width-1))*6 + 5] = x+1 + (z+1) * tex->width;
-		}
-	for (x = 0; x < tex->width; x++)
-		for (z = 0; z < tex->height; z++)
-		{
-			if (x < 1 || x > tex->width - 1 || z < 1 || z > tex->height - 1)
-			{
-				normalArray[(x + z * tex->width)*3 + 0] = 0;
-				normalArray[(x + z * tex->width)*3 + 1] = 1;
-				normalArray[(x + z * tex->width)*3 + 2] = 0;
-			}
-			else
-			{
 
-				vec3 N = {1.0,1.0,1.0};
 
-	// read neightbor heights
-				float heightNegZ = vertexArray[(x + (z-1) * tex->width)*3 + 1];
-				float heightPosZ = vertexArray[(x + (z+1) * tex->width)*3 + 1];
-				float heightNegX = vertexArray[((x-1) + z * tex->width)*3 + 1];
-				float heightPosX = vertexArray[((x+1) + z * tex->width)*3 + 1];
-	// deduce terrain normal
-				N.z = heightNegZ - heightPosZ;
-				N.x = heightNegX - heightPosX;
-				N.y = 2.0;
-				N = Normalize(N);
-	// Normal vectors.
-				normalArray[(x + z * tex->width)*3 + 0] = N.x;
-				normalArray[(x + z * tex->width)*3 + 1] = N.y;
-				normalArray[(x + z * tex->width)*3 + 2] = N.z;
-			}
-		}
 
-	// End of terrain generation
-
-	// Create Model and upload to GPU:
-
-	Model* model = LoadDataToModel(
-			vertexArray,
-			normalArray,
-			texCoordArray,
-			NULL,
-			indexArray,
-			vertexCount,
-			triangleCount*3);
-
-	return model;
-}
 
 
 // vertex array object
-Model *m, *m2, *tm;
+Model *m, *m2;
 // Reference to shader program
-GLuint program, lamboshader;
-GLuint tex1, tex2, dirttex;
-TextureData ttex; // terrain
+Terrain* terrain;
+GLuint tex2;
+
 mat4 Rot, Trans;
 GLfloat t;
+
 void init(void)
 {
 	// GL inits
+	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 5000.0);
 	glClearColor(0.859,0.957,0.998,1);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
-	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 5000.0);
+	printf("%d", 5);
+	terrain = createTerrain(projectionMatrix);
+
+
 	// Load and compile shader
-	program = loadShaders("shaders/terrain4-5.vert", "shaders/terrain4-5.frag");
 
-	glUseProgram(program);
-	printError("init shader");
-	glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-	glUniform1i(glGetUniformLocation(program, "tex"), 0); // Texture unit 0
-	glUniform1i(glGetUniformLocation(program, "dirttex"), 1);
-	LoadTGATextureSimple("textures/grass.tga", &tex1);
-	LoadTGATextureSimple("textures/dirt.tga", &dirttex);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex1);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, dirttex);
-// Load terrain data
-
-	LoadTGATextureData("textures/fft-terrain.tga", &ttex);
-	tm = GenerateTerrain(&ttex);
-	printError("init terrain");
 }
 
 
@@ -166,14 +60,14 @@ void display(void)
 	printError("pre display");
 
 	// ###### TERRAIN #################
-	glUseProgram(program);
+	glUseProgram(terrain->shader);
 	// Build matrix
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
+	glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 
 	//glBindTexture(GL_TEXTURE_2D, tex1);		// Bind Our Texture tex1
-	DrawModel(tm, program, "inPosition", "inNormal", "inTexCoord");
+	DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
 	printError("display 2");
 	glutSwapBuffers();
 }
@@ -210,10 +104,13 @@ void mouse(int x, int y)
 	angle += diffx/700;
 }
 
-float heightFinder(float xPos, float zPos)
+float heightFinder(float xPos, float zPos, int texwidth)
 {
   int x = (int)xPos;
 	int z = (int)zPos;
+
+	//GLfloat * vertexArray = terrain->vertexArray;
+	//int texwidth = terrain->texwidth;
 
 	xPos = fmod(xPos, 1.0f);
 	zPos = fmod(zPos, 1.0f);
@@ -301,7 +198,7 @@ void timer(int i)
 		cam = VectorSub(cam, side_movement);
 	}
 
-	cam.y = heightFinder(cam.x, cam.z) + 2;
+	cam.y = heightFinder(cam.x, cam.z, terrain->texwidth) + 2;
 
 	lookAtPoint.x = cam.x + cos(angle)*cos(yangle);
 	lookAtPoint.z = cam.z + sin(angle)*cos(yangle);
