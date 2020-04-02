@@ -210,7 +210,7 @@ void timer(int i)
 	glutTimerFunc(20, &timer, i);
 	glutPostRedisplay();
 }
-
+//dasd
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);

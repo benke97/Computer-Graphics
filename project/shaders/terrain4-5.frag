@@ -12,12 +12,5 @@ void main(void)
 	vec3 light = vec3(0.58, 0.58, 0.58);
 	float shade = dot(light, normalize(fragnormal));
 	shade = clamp(shade, 0, 1);
-	if (outPosition.y > 4)
-	{
-		outColor = shade*texture(tex, texCoord);
-	}
-	else
-	{
-		outColor = shade*texture(dirttex, texCoord);
-	}
+	outColor = shade*texture(dirttex, texCoord);
 }
