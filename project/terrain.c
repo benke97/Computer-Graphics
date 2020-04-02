@@ -1,28 +1,11 @@
-#include "VectorUtils3.h"
+
+#include "Terrain.h"
+//#include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "GL_utilities.h"
 
-
-//typedef struct {} Terrain;
-Model* GenerateTerrain();
-GLfloat *vertexArray;
-
-
-typedef struct Terrain {
-  int texwidth;
-  int texheight;
-
-  TextureData ttex; // terrain
-
-  Model *tm;
-  // Reference to shader this->shader
-  GLuint shader;
-  GLuint tex1, dirttex;
-} Terrain;
-
-
-
-
+//Model* GenerateTerrain();
 
 void initTerrain(Terrain* this, mat4 projectionMatrix){
   this->shader = loadShaders("shaders/terrain4-5.vert", "shaders/terrain4-5.frag");
@@ -46,10 +29,10 @@ void initTerrain(Terrain* this, mat4 projectionMatrix){
 }
 
 Terrain* createTerrain(mat4 projectionMatrix){
-  printf("%d", 5);
+
   Terrain* result = (Terrain*) malloc(sizeof(Terrain));
   initTerrain(result, projectionMatrix);
-  printf("%d", 5);
+
   return result;
 }
 
@@ -65,7 +48,7 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
 	terrain->texheight = tex->height;
   //GLfloat * vertexArray = this->vertexArray;
 
-	vertexArray = malloc(sizeof(GLfloat) * 3 * vertexCount);
+	terrain->vertexArray = (GLfloat *)malloc(sizeof(GLfloat) * 3 * vertexCount);
 	GLfloat *normalArray = malloc(sizeof(GLfloat) * 3 * vertexCount);
 	GLfloat *texCoordArray = malloc(sizeof(GLfloat) * 2 * vertexCount);
 	GLuint *indexArray = malloc(sizeof(GLuint) * triangleCount*3);
@@ -75,9 +58,9 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
 		for (z = 0; z < tex->height; z++)
 		{
 // Vertex array. You need to scale this properly
-			vertexArray[(x + z * tex->width)*3 + 0] = x /1.0;
-			vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)]/ 10.0;
-			vertexArray[(x + z * tex->width)*3 + 2] = z / 1.0;
+			terrain->vertexArray[(x + z * tex->width)*3 + 0] = x /1.0;
+			terrain->vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)]/ 5.0;
+			terrain->vertexArray[(x + z * tex->width)*3 + 2] = z / 1.0;
 // Normal vectors. You need to calculate these.
 			normalArray[(x + z * tex->width)*3 + 0] = 0.0;
 			normalArray[(x + z * tex->width)*3 + 1] = 1.0;
@@ -113,10 +96,10 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
 				vec3 N = {1.0,1.0,1.0};
 
 	// read neightbor heights
-				float heightNegZ = vertexArray[(x + (z-1) * tex->width)*3 + 1];
-				float heightPosZ = vertexArray[(x + (z+1) * tex->width)*3 + 1];
-				float heightNegX = vertexArray[((x-1) + z * tex->width)*3 + 1];
-				float heightPosX = vertexArray[((x+1) + z * tex->width)*3 + 1];
+				float heightNegZ = terrain->vertexArray[(x + (z-1) * tex->width)*3 + 1];
+				float heightPosZ = terrain->vertexArray[(x + (z+1) * tex->width)*3 + 1];
+				float heightNegX = terrain->vertexArray[((x-1) + z * tex->width)*3 + 1];
+				float heightPosX = terrain->vertexArray[((x+1) + z * tex->width)*3 + 1];
 	// deduce terrain normal
 				N.z = heightNegZ - heightPosZ;
 				N.x = heightNegX - heightPosX;
@@ -134,7 +117,7 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
 	// Create Model and upload to GPU:
 
 	Model* model = LoadDataToModel(
-			vertexArray,
+			terrain->vertexArray,
 			normalArray,
 			texCoordArray,
 			NULL,
@@ -143,4 +126,63 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
 			triangleCount*3);
 
 	return model;
+}
+
+
+float heightFinder(float xPos, float zPos, int texwidth, Terrain* terrain)
+{
+  int x = (int)xPos;
+	int z = (int)zPos;
+
+	//GLfloat * vertexArray = terrain->vertexArray;
+	//int texwidth = terrain->texwidth;
+
+	xPos = fmod(xPos, 1.0f);
+	zPos = fmod(zPos, 1.0f);
+
+	vec3 v1 = {0.0, 0.0, 0.0};
+	vec3 v2 = {0.0, 0.0, 0.0};
+	vec3 v3 = {0.0, 0.0, 0.0};
+
+	if (xPos + zPos > 1)
+	{
+
+		v1.x = 1;
+		v1.y = terrain->vertexArray[((x+1) + z * texwidth)*3 + 1];
+		v1.z = 0;
+
+		v2.x = 1;
+		v2.y = terrain->vertexArray[((x+1) + (z+1) * texwidth)*3 + 1];
+		v2.z = 1;
+
+		v3.x = 0;
+		v3.y = terrain->vertexArray[(x + (z+1) * texwidth)*3 + 1];
+		v3.z = 1;
+	}
+	else
+	{
+
+		v1.x = 1;
+		v1.y = terrain->vertexArray[((x+1) + z * texwidth)*3 + 1];
+		v1.z = 0;
+
+		v2.x = 0;
+		v2.y = terrain->vertexArray[(x + z * texwidth)*3 + 1];
+		v2.z = 0;
+
+		v3.x = 0;
+		v3.y = terrain->vertexArray[(x + (z+1) * texwidth)*3 + 1];
+		v3.z = 1;
+	}
+
+	// Barycentric
+	float w1 = ((v2.z - v3.z)*(xPos - v3.x) + (v3.x - v2.x)*(zPos - v3.z))
+			/ ((v2.z - v3.z)*(v1.x - v3.x) + (v3.x - v2.x)*(v1.z - v3.z));
+
+	float w2 = ((v3.z - v1.z)*(xPos - v3.x) + (v1.x - v3.x)*(zPos - v3.z))
+			/ ((v2.z - v3.z)*(v1.x - v3.x) + (v3.x - v2.x)*(v1.z - v3.z));
+
+	float w3 = 1.0 - w2 - w1;
+
+	return (w1*v1.y + w2*v2.y + w3*v3.y);
 }
