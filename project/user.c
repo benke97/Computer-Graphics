@@ -1,3 +1,8 @@
+#ifdef __APPLE__
+	#include <OpenGL/gl3.h>
+	// Linking hint for Lightweight IDE
+	// uses framework Cocoa
+#endif
 #include "User.h"
 #include "MicroGlut.h"
 #include "GL_utilities.h"
@@ -53,7 +58,7 @@ void userInput(User * user, Terrain * terrain)
 	}
 	if (glutKeyIsDown('w'))
 	{
-		if (glutKeyIsDown(GLUT_KEY_LEFT_SHIFT))
+		/*if (glutKeyIsDown(GLUT_KEY_LEFT_SHIFT))
 		{
 			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
 			user->cam = VectorSub(user->cam, a);
@@ -62,7 +67,9 @@ void userInput(User * user, Terrain * terrain)
 		{
 			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
 			user->cam = VectorSub(user->cam, a);
-		}
+		}*/
+			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
+			user->cam = VectorSub(user->cam, a);
 	}
 	if (glutKeyIsDown('a'))
 	{

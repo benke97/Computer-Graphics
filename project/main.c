@@ -9,6 +9,7 @@
 
 mat4 projectionMatrix;
 Terrain* terrain;
+Terrain* roof;
 User * user;
 
 void init(void)
@@ -19,7 +20,12 @@ void init(void)
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
 	printf("%d", 5);
-	terrain = createTerrain(projectionMatrix);
+	int heightmap = 1;
+	int height = 0;
+	terrain = createTerrain(projectionMatrix,heightmap,height);
+	heightmap = 0;
+	height = 20;
+	roof = createTerrain(projectionMatrix,heightmap,height);
 	user = createUser();
 }
 
@@ -38,6 +44,8 @@ void display(void)
 	total = Mult(camMatrix, modelView);
 	glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
+	glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
 	printError("display 2");
 	glutSwapBuffers();
 }

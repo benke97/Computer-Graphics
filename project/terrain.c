@@ -7,7 +7,7 @@
 
 //Model* GenerateTerrain();
 
-void initTerrain(Terrain* this, mat4 projectionMatrix){
+void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height){
   this->shader = loadShaders("shaders/terrain4-5.vert", "shaders/terrain4-5.frag");
 
   glUseProgram(this->shader);
@@ -22,23 +22,30 @@ void initTerrain(Terrain* this, mat4 projectionMatrix){
   glBindTexture(GL_TEXTURE_2D, this->tex1);
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, this->dirttex);
-
-  LoadTGATextureData("textures/test3.tga", &this->ttex);
-  this->tm = GenerateTerrain(&this->ttex, this);
+  if (heightmap == 1)
+  {
+  	LoadTGATextureData("textures/test2.tga", &this->ttex);
+  	this->tm = GenerateTerrain(&this->ttex, this, height);
+  }
+  else
+  {
+  	LoadTGATextureData("textures/test3.tga", &this->ttex);
+  	this->tm = GenerateTerrain(&this->ttex, this, height);
+  }
   printError("init terrain");
 }
 
-Terrain* createTerrain(mat4 projectionMatrix){
+Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height){
 
   Terrain* result = (Terrain*) malloc(sizeof(Terrain));
-  initTerrain(result, projectionMatrix);
+  initTerrain(result, projectionMatrix, heightmap, height);
 
   return result;
 }
 
 
 
-Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
+Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 {
   //TextureData* tex = &this->ttex;
 	int vertexCount = tex->width * tex->height;
@@ -59,7 +66,7 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain)
 		{
 // Vertex array. You need to scale this properly
 			terrain->vertexArray[(x + z * tex->width)*3 + 0] = x /1.0;
-			terrain->vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)]/ 5.0;
+			terrain->vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)]/ 10.0 + height;
 			terrain->vertexArray[(x + z * tex->width)*3 + 2] = z / 1.0;
 // Normal vectors. You need to calculate these.
 			normalArray[(x + z * tex->width)*3 + 0] = 0.0;

@@ -21,9 +21,9 @@ typedef struct Terrain {
   GLuint tex1, dirttex;
 } Terrain;
 
-void initTerrain(Terrain* this, mat4 projectionMatrix);
-Terrain* createTerrain(mat4 projectionMatrix);
-Model* GenerateTerrain();
+void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height);
+Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height);
+Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height);
 float heightFinder(float xPos, float zPos, int texwith, Terrain* terrain);
 
 #endif
