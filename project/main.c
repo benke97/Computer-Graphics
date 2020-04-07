@@ -6,11 +6,13 @@
 
 #include "Terrain.h"
 #include "User.h"
+#include "Lightball.h"
 
-mat4 projectionMatrix;
+mat4 projectionMatrix, trans, rot1;
 Terrain* terrain;
 Terrain* roof;
 User * user;
+LightBall * lightball;
 
 void init(void)
 {
@@ -27,6 +29,7 @@ void init(void)
 	height = 20;
 	roof = createTerrain(projectionMatrix,heightmap,height);
 	user = createUser();
+	lightball = createLightBall(projectionMatrix);
 }
 
 void display(void)
@@ -46,6 +49,12 @@ void display(void)
 	DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
 	glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
+
+	//Draw LightBall
+	trans = T(user->cam.x + 5,heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain),user->cam.z);
+	rot1 = Rx(0);
+	displayLightBall(lightball, camMatrix, trans, rot1);
+
 	printError("display 2");
 	glutSwapBuffers();
 }
