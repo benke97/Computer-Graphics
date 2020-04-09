@@ -4,7 +4,7 @@
 void initFlashLight (FlashLight * FlashLight, vec3* pos, vec3* dir) {
   FlashLight->position = pos;
   FlashLight->direction = dir;
-  FlashLight->cutOffAngle = cos(12.5f);
+  FlashLight->cutOffAngle = cos(M_PI/12);
 }
 
 FlashLight * createFlashLight(vec3* pos, vec3* dir){
@@ -12,4 +12,9 @@ FlashLight * createFlashLight(vec3* pos, vec3* dir){
   initFlashLight(result, pos, dir);
 
   return result;
+}
+
+void FlashLight__setDirection(FlashLight* flashlight, vec3* dir)
+{
+  flashlight->direction = dir;
 }

@@ -48,7 +48,8 @@ void init(void)
 	user = createUser();
 
 	// Place flashlight on user position with direction of lookAtPoint
-	flashlight = createFlashLight(&user->cam, &user->lookAtPoint);
+  vec3 dir = VectorSub(user->lookAtPoint, user->cam);
+	flashlight = createFlashLight(&user->cam, &dir);
 
 }
 
@@ -108,6 +109,15 @@ void display(void)
 
 	//Draw LightBall
 	//trans = T(user->cam.x + 5,heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain),user->cam.z);
+
+
+  // FlashLight
+  vec3 dir = VectorSub(user->lookAtPoint, user->cam);
+  FlashLight__setDirection(flashlight, &dir);
+
+  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightPosition"), flashlight->position->x, flashlight->position->y, flashlight->position->z);
+  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightDirection"), flashlight->direction->x, flashlight->direction->y, flashlight->direction->z);
+  glUniform1f(glGetUniformLocation(terrain->shader, "flashlightCutOff"), flashlight->cutOffAngle);
 
 
 	printError("display 2");

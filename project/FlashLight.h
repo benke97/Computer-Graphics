@@ -12,6 +12,7 @@ typedef struct FlashLight
 
 void initFlashLight (FlashLight * FlashLight, vec3* pos, vec3* dir);
 FlashLight * createFlashLight(vec3* pos, vec3* dir);
+void FlashLight__setDirection(FlashLight* flashlight, vec3* dir);
 
 
 

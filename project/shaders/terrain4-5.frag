@@ -16,6 +16,12 @@ uniform vec3 lightSourcesColorArr[2];
 uniform float specularExponent;
 uniform bool isDirectional[2];
 
+// For flashlight:
+uniform vec3 flashlightPosition;
+uniform vec3 flashlightDirection;
+uniform float flashlightCutOff;
+
+
 void main(void)
 {
 	vec3 ambient = vec3(0.0,0.0,0.0);
@@ -28,6 +34,23 @@ void main(void)
 	float specStrength = 0.5f;
 	float spec = 0.0f;
 	totcolor += ambient;
+
+	// --------- FlashLight ------------
+	vec3 flashDir = normalize(flashlightPosition - outPosition);
+	float theta = dot(flashDir, normalize(-flashlightDirection));
+
+	if (theta > flashlightCutOff)
+	{
+		dist = distance(flashlightPosition, outPosition);
+		color = vec3(4/dist, 4/dist, 4/dist);
+		color.x = clamp(color.x, 0, 0.8);
+		color.y = clamp(color.y, 0, 0.8);
+		color.z = clamp(color.z, 0, 0.8);
+
+		totcolor += color;
+	}
+
+	// ---------------------------------
 	for (int i = 0; i<= 1; i++)
 	{
 		if (isDirectional[i])
