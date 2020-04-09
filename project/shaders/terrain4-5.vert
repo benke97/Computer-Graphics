@@ -3,6 +3,7 @@
 in  vec3 inPosition;
 in  vec3 inNormal;
 in vec2 inTexCoord;
+
 out vec2 texCoord;
 out vec3 fragnormal;
 out vec3 outPosition;
@@ -13,7 +14,13 @@ uniform mat4 mdlMatrix;
 
 void main(void)
 {
+	//before ball:
 	outPosition = inPosition;
+
+	//after ball:
+	//outPosition = vec3(mdlMatrix*vec4(inPosition,1.0));
+
+
 	fragnormal = inNormal;
 	mat3 normalMatrix1 = mat3(mdlMatrix);
 	texCoord = inTexCoord;
