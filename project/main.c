@@ -14,6 +14,21 @@ Terrain* roof;
 User * user;
 LightBall * lightball;
 
+vec3 ballposition;
+
+vec3 lightSourcesColorsArr[] = { {0.0f, 0.0f, 0.0f},
+
+                                 {1.0f, 1.0f, 1.0f} }; // White light
+
+GLint isDirectional[] = {1,0};
+
+vec3 lightSourcesDirectionsPositions[] = { {0.58, 0.58, 0.58}, // Sunlight
+
+                                       {0.0f, 0.0f, 0.0f} }; // Ball
+
+GLfloat specularExponent = 100;
+
+
 void init(void)
 {
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 5000.0);
@@ -29,7 +44,6 @@ void init(void)
 	height = 20;
 	roof = createTerrain(projectionMatrix,heightmap,height);
 	user = createUser();
-	lightball = createLightBall(projectionMatrix);
 }
 
 void display(void)
@@ -45,15 +59,50 @@ void display(void)
 	glUseProgram(terrain->shader);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
+
+
+  if (user->lightball_shooting_activated) {
+    user->lightball_shooting_activated = false;
+    lightball = createLightBall(projectionMatrix);
+    lightball->position = user->cam;
+    lightSourcesDirectionsPositions[1] = lightball->position;
+    trans = T(lightball->position.x, lightball->position.y + 10, lightball->position.z);
+    //trans = T(0, 27, 0);
+    rot1 = Rx(0);
+
+  }
+  if (lightball) {
+    //displayLightBall(lightball, camMatrix, trans, rot1);
+  }
+  //printf("x: %f, y: %f, z: %f \n", user->cam.x, user->cam.y, user->cam.z);
+	//For ball:
+	//ballposition = SetVector(user->cam.x + 5, heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain), user->cam.z);
+  //ballposition = SetVector(0, 27, 0);
+
+
+	//printf("as %f", lightSourcesDirectionsPositions[1].x);
+
+	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 2, &lightSourcesDirectionsPositions[0].x);
+
+	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesColorArr"), 2, &lightSourcesColorsArr[0].x);
+
+	glUniform1iv(glGetUniformLocation(terrain->shader, "isDirectional"), 2, isDirectional);
+
+	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
+
+	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), user->cam.x, user->cam.y, user->cam.z);
+
+
+	//before ball:
 	glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
 	glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
 
+
 	//Draw LightBall
-	trans = T(user->cam.x + 5,heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain),user->cam.z);
-	rot1 = Rx(0);
-	displayLightBall(lightball, camMatrix, trans, rot1);
+	//trans = T(user->cam.x + 5,heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain),user->cam.z);
+
 
 	printError("display 2");
 	glutSwapBuffers();

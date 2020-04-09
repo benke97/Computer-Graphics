@@ -10,7 +10,7 @@ void initLightBall(LightBall* this, mat4 projectionMatrix) {
   this->shader = loadShaders("shaders/lightball.vert", "shaders/lightball.frag");
   glUseProgram(this->shader);
   printError("init lightball shader");
-
+  this->position = SetVector(0,0,0);
   this->model = LoadModelPlus("models/groundsphere.obj");
 
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
@@ -48,3 +48,10 @@ void displayLightBall(LightBall* lightball, mat4 wtvMatrix, mat4 trans, mat4 rot
 	glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(lightball->model, lightball->shader, "in_Position", "in_Normal", "inTexCoord");
 };
+
+
+void shootLightBall(LightBall* lightball, vec3 user_position) {
+  while (1){
+    lightball->position = user_position;
+  }
+}

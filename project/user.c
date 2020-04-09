@@ -26,6 +26,7 @@ void initUser (User * user) {
   user->lookAtPoint = SetVector (200, 20, 200);
   user->upVector = SetVector (0, 1, 0);
   user->side_movement = SetVector (0,0,0);
+	user->lightball_shooting_activated = false;
 }
 
 
@@ -88,4 +89,10 @@ void userInput(User * user, Terrain * terrain)
 	user->lookAtPoint.z = user->cam.z + sin(angle)*cos(yangle);
 	user->lookAtPoint.y = user->cam.y + sin(yangle);
 
+	//For LightBall:
+
+	if (glutKeyIsDown('f'))
+	{
+		user->lightball_shooting_activated = true;
+	}
 }
