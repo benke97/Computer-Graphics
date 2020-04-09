@@ -7,7 +7,7 @@ typedef struct FlashLight
 {
   vec3* position;
   vec3* direction;
-  GLfloat* cutOffAngle;
+  GLfloat cutOffAngle;
 } FlashLight;
 
 void initFlashLight (FlashLight * FlashLight, vec3* pos, vec3* dir);
