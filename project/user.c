@@ -48,44 +48,151 @@ void mouse(int x, int y)
 }
 
 
-void userInput(User * user, Terrain * terrain)
+void userInput(User * user, Terrain * roof, Terrain * floor)
 {
   user->side_movement = ScalarMult(Normalize(CrossProduct(VectorSub(user->cam, user->lookAtPoint),user->upVector)), 0.1);
 	if (glutKeyIsDown('s'))
 	{
-		vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
-		user->cam = VectorAdd(user->cam, a);
+		if (validMove(user, roof, floor,2))
+		{
+			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
+			user->cam = VectorAdd(user->cam, a);
+		}
 	}
 	if (glutKeyIsDown('w'))
 	{
-		/*if (glutKeyIsDown(GLUT_KEY_LEFT_SHIFT))
+		if (glutKeyIsDown(GLUT_KEY_LEFT_SHIFT))
 		{
-			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
-			user->cam = VectorSub(user->cam, a);
+			if (validMove(user, roof, floor,5))
+			{
+				vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
+				user->cam = VectorSub(user->cam, a);
+			}
+			else
+			{
+				if (validMove(user, roof, floor,1))
+				{
+					vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
+					user->cam = VectorSub(user->cam, a);
+				}
+			}
 		}
 		else
 		{
-			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
-			user->cam = VectorSub(user->cam, a);
-		}*/
-			vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
-			user->cam = VectorSub(user->cam, a);
+			if (validMove(user, roof, floor,1))
+			{
+				vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
+				user->cam = VectorSub(user->cam, a);
+			}
+		}
+		/*	vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
+			user->cam = VectorSub(user->cam, a);*/
 	}
 	if (glutKeyIsDown('a'))
 	{
-		user->lookAtPoint = VectorAdd(user->lookAtPoint ,user->side_movement);
-		user->cam = VectorAdd(user->cam, user->side_movement);
+		if (validMove(user, roof, floor,4))
+		{
+			user->lookAtPoint = VectorAdd(user->lookAtPoint ,user->side_movement);
+			user->cam = VectorAdd(user->cam, user->side_movement);
+		}
 	}
 	if (glutKeyIsDown('d'))
 	{
-		user->lookAtPoint = VectorSub(user->lookAtPoint,user->side_movement);
-		user->cam = VectorSub(user->cam, user->side_movement);
+		if (validMove(user, roof, floor,3))
+		{
+			user->lookAtPoint = VectorSub(user->lookAtPoint,user->side_movement);
+			user->cam = VectorSub(user->cam, user->side_movement);
+		}
 	}
 
-	user->cam.y = heightFinder(user->cam.x, user->cam.z, terrain->texwidth, terrain) + 2;
+	user->cam.y = heightFinder(user->cam.x, user->cam.z, floor->texwidth, floor) + 2;
 
 	user->lookAtPoint.x = user->cam.x + cos(angle)*cos(yangle);
 	user->lookAtPoint.z = user->cam.z + sin(angle)*cos(yangle);
 	user->lookAtPoint.y = user->cam.y + sin(yangle);
 
+}
+
+bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
+{
+	vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
+	vec3 tmp = VectorSub(user->cam, a);
+	switch(move)
+	{
+		case(1): //framåt "w"
+			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
+			tmp = VectorSub(user->cam, a);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		break;
+
+		case(2): //bakåt "s"
+			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
+			tmp = VectorAdd(user->cam, a);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		break;
+
+		case(3): //höger "d"
+			tmp = VectorSub(user->cam, user->side_movement);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		break;
+
+		case(4): //vänster "a"
+			tmp = VectorAdd(user->cam, user->side_movement);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		break;
+
+		case(5): //snabb framåt "shift + w"
+			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
+			tmp = VectorSub(user->cam, a);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		break;
+	}
+	/*
+	//bakåt "s"
+		case 2:
+			break;
+		//vänster "a"
+		case 3:
+			break;
+		//höger "d"
+		case 4:
+			break;
+		//snabb fram "w+shift"
+		case 5:
+		break;*/
 }
