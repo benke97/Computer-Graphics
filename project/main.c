@@ -72,7 +72,7 @@ void display(void)
     user->lightball_shooting_activated = false;
     lightball = createLightBall(projectionMatrix);
     lightball->position = user->cam;
-    lightball->direction = Normalize(user->lookAtPoint);
+    lightball->direction = Normalize(VectorSub(user->lookAtPoint, user->cam));
   }
 
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 2, &lightSourcesDirectionsPositions[0].x);
