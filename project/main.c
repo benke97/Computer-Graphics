@@ -6,11 +6,13 @@
 
 #include "Terrain.h"
 #include "User.h"
+#include "FlashLight.h"
 
 mat4 projectionMatrix;
 Terrain* terrain;
 Terrain* roof;
 User * user;
+FlashLight* flashlight;
 
 void init(void)
 {
@@ -27,6 +29,10 @@ void init(void)
 	height = 20;
 	roof = createTerrain(projectionMatrix,heightmap,height);
 	user = createUser();
+
+	// Place flashlight on user position with direction of lookAtPoint
+	flashlight = createFlashLight(&user->cam, &user->lookAtPoint);
+
 }
 
 void display(void)
