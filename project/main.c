@@ -110,7 +110,7 @@ void display(void)
 
 void timer(int i)
 {
-	userInput(user, terrain);
+	userInput(user, roof, terrain);
 	glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH)/ 2,glutGet(GLUT_WINDOW_HEIGHT)/ 2);
 	glutTimerFunc(20, &timer, i);
 	glutPostRedisplay();
