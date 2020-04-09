@@ -73,8 +73,8 @@ void main(void)
 		}
 
 		// Specular shade
-		//vec3 r = reflect(-light, fragnormal);
-		vec3 r = 2*fragnormal*dot(light, fragnormal) - light;
+		vec3 r = reflect(-light, fragnormal);
+		//vec3 r = 2*fragnormal*dot(light, fragnormal) - light;
 		vec3 eyeDir = normalize(camPos - outPosition);
 		if ( dot(light, fragnormal) > 0.0)
 		{
@@ -85,7 +85,7 @@ void main(void)
 			color = spec*lightSourcesColorArr[i];
 					totcolor += color;
 		}
-
+		
 	}
 
 	totcolor = clamp(totcolor, 0, 1);

@@ -29,7 +29,7 @@ void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height
   }
   else
   {
-  	LoadTGATextureData("textures/test3.tga", &this->ttex);
+  	LoadTGATextureData("textures/tak2.tga", &this->ttex);
   	this->tm = GenerateTerrain(&this->ttex, this, height);
   }
   printError("init terrain");
@@ -192,4 +192,11 @@ float heightFinder(float xPos, float zPos, int texwidth, Terrain* terrain)
 	float w3 = 1.0 - w2 - w1;
 
 	return (w1*v1.y + w2*v2.y + w3*v3.y);
+}
+
+float heightdiff(float xPos, float zPos, int texwidth, Terrain* roof, Terrain* floor)
+{
+  float roofheight = heightFinder(xPos,zPos,texwidth,roof);
+  float floorheight = heightFinder(xPos,zPos,texwidth,floor);
+  return roofheight - floorheight;
 }
