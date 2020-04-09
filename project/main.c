@@ -46,6 +46,7 @@ void init(void)
 	height = 20;
 	roof = createTerrain(projectionMatrix,heightmap,height);
 	user = createUser();
+  //lightball = createLightBall(projectionMatrix);
 
 	// Place flashlight on user position with direction of lookAtPoint
 	flashlight = createFlashLight(&user->cam, &user->lookAtPoint);
@@ -71,22 +72,8 @@ void display(void)
     user->lightball_shooting_activated = false;
     lightball = createLightBall(projectionMatrix);
     lightball->position = user->cam;
-    lightSourcesDirectionsPositions[1] = lightball->position;
-    trans = T(lightball->position.x, lightball->position.y + 10, lightball->position.z);
-    //trans = T(0, 27, 0);
-    rot1 = Rx(0);
-
+    lightball->direction = Normalize(user->lookAtPoint);
   }
-  if (lightball) {
-    //displayLightBall(lightball, camMatrix, trans, rot1);
-  }
-  //printf("x: %f, y: %f, z: %f \n", user->cam.x, user->cam.y, user->cam.z);
-	//For ball:
-	//ballposition = SetVector(user->cam.x + 5, heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain), user->cam.z);
-  //ballposition = SetVector(0, 27, 0);
-
-
-	//printf("as %f", lightSourcesDirectionsPositions[1].x);
 
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 2, &lightSourcesDirectionsPositions[0].x);
 
@@ -107,7 +94,14 @@ void display(void)
 
 
 	//Draw LightBall
-	//trans = T(user->cam.x + 5,heightFinder(user->cam.x,user->cam.z, terrain->texwidth, terrain),user->cam.z);
+
+  if (lightball) {
+    MoveLightBall(lightball);
+    lightSourcesDirectionsPositions[1] = lightball->position;
+    trans = T(lightball->position.x, lightball->position.y, lightball->position.z);
+    rot1 = Rx(0);
+    displayLightBall(lightball, camMatrix, trans, rot1);
+  }
 
 
 	printError("display 2");

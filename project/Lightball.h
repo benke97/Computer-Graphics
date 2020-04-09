@@ -12,6 +12,7 @@ typedef struct LightBall {
   Model *model;
   GLuint shader;
   vec3 position;
+  vec3 direction;
 } LightBall;
 
 
@@ -19,5 +20,5 @@ void initLightBall(LightBall* this, mat4 projectionMatrix);
 LightBall* createLightBall(mat4 projectionMatrix);
 void drawLightBall(LightBall* lightball, mat4 projectionMatrix);
 void displayLightBall(LightBall* lightball, mat4 wtvMatrix, mat4 trans, mat4 rot1);
-void shootLightBall(LightBall* lightball, vec3 user_position);
+void MoveLightBall(LightBall* lightball);
 #endif
