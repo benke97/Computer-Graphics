@@ -12,8 +12,7 @@ void initLightBall(LightBall* this, mat4 projectionMatrix) {
   glUseProgram(this->shader);
   printError("init lightball shader");
   this->position = SetVector(0,0,0);
-  this->position = SetVector(0,0,0);
-
+  this->active = true;
   this->model = LoadModelPlus("models/groundsphere.obj");
 
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);

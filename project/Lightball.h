@@ -13,6 +13,7 @@ typedef struct LightBall {
   GLuint shader;
   vec3 position;
   vec3 direction;
+  bool active;
 } LightBall;
 
 

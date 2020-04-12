@@ -16,20 +16,16 @@ Terrain* terrain;
 Terrain* roof;
 User * user;
 FlashLight* flashlight;
-LightBall * lightball;
+
 vec3 ballposition;
-vec3 lightSourcesColorsArr[] = { {0.0f, 0.0f, 0.0f},
-
-                                 {1.0f, 1.0f, 1.0f} }; // White light
-
-GLint isDirectional[] = {1,0};
-
-vec3 lightSourcesDirectionsPositions[] = { {0.58, 0.58, 0.58}, // Sunlight
-
-                                       {0.0f, 0.0f, 0.0f} }; // Ball
-
+vec3 lightBallsColor[100] = {};
+vec3 lightBallsPositions[100] = {};
+LightBall lightballs[100] = {};
+int LightBallsQuantity;
 GLfloat specularExponent = 100;
 
+GLint isDirectional[] = {0,0,0,0};
+int timeUntilNextBall;
 
 void init(void)
 {
@@ -47,7 +43,8 @@ void init(void)
 	roof = createTerrain(projectionMatrix,heightmap,height);
 	user = createUser();
   //lightball = createLightBall(projectionMatrix);
-
+  LightBallsQuantity = 0;
+  timeUntilNextBall = 0;
 	// Place flashlight on user position with direction of lookAtPoint
   vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(&user->cam, &dir);
@@ -68,19 +65,31 @@ void display(void)
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
 
+  if (user->lightball_shooting_activated && timeUntilNextBall < 0) {
+    LightBall * lightball;
 
-  if (user->lightball_shooting_activated) {
-    user->lightball_shooting_activated = false;
     lightball = createLightBall(projectionMatrix);
+    lightBallsColor[LightBallsQuantity] = SetVector(1.0f, 1.0f, 1.0f);
     lightball->position = user->cam;
+    lightBallsPositions[LightBallsQuantity] = lightball->position;
     lightball->direction = Normalize(VectorSub(user->lookAtPoint, user->cam));
+    lightballs[LightBallsQuantity] = *lightball;
+    LightBallsQuantity += 1;
+    timeUntilNextBall = 10;
   }
+	else {
+		timeUntilNextBall--;
+		user->lightball_shooting_activated = false;
+	}
 
-	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 2, &lightSourcesDirectionsPositions[0].x);
 
-	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesColorArr"), 2, &lightSourcesColorsArr[0].x);
+  glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), LightBallsQuantity);
 
-	glUniform1iv(glGetUniformLocation(terrain->shader, "isDirectional"), 2, isDirectional);
+	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), LightBallsQuantity, &lightBallsPositions[0].x);
+
+	glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesColorArr"), LightBallsQuantity, &lightBallsColor[0].x);
+
+  glUniform1iv(glGetUniformLocation(terrain->shader, "isDirectional"), 4, isDirectional);
 
 	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
 
@@ -95,17 +104,45 @@ void display(void)
 
 
 	//Draw LightBall
-
-  if (lightball) {
+  for (int ball=0; ball < LightBallsQuantity; ball++){
+    LightBall * lightball = &lightballs[ball];
     MoveLightBall(lightball);
-    lightSourcesDirectionsPositions[1] = lightball->position;
+    lightBallsPositions[ball] = lightball->position;
     trans = T(lightball->position.x, lightball->position.y, lightball->position.z);
     rot1 = Rx(0);
     displayLightBall(lightball, camMatrix, trans, rot1);
+
+		if (Norm(lightball->position) > 200) {
+			lightball->active = false;
+		}
   }
+
+	LightBall new_lightballs[100];
+	vec3 new_lightBallsPositions[100];
+	vec3 new_lightBallsColor[100];
+	int new_ball = 0;
+
+  for (int ball=0; ball < LightBallsQuantity; ball++){
+    if (lightballs[ball].active) {
+        new_lightballs[new_ball] = lightballs[ball];
+        new_lightBallsPositions[new_ball] = lightBallsPositions[ball];
+				new_lightBallsColor[new_ball] = lightBallsColor[ball];
+				new_ball++;
+    }
+  }
+
+	LightBallsQuantity = new_ball;
+
+	for (int ball=0; ball < LightBallsQuantity; ball++) {
+		lightballs[ball] = new_lightballs[ball];
+		lightBallsPositions[ball] = new_lightBallsPositions[ball];
+		lightBallsColor[ball] = new_lightBallsColor[ball];
+	}
 
 
   // FlashLight
+  glUseProgram(terrain->shader);
+
   vec3 dir = VectorSub(user->lookAtPoint, user->cam);
   FlashLight__setDirection(flashlight, &dir);
 

@@ -10,11 +10,12 @@ uniform sampler2D tex;
 uniform sampler2D dirttex;
 
 //For ball:
+uniform int LightBallsQuantity;
 uniform vec3 camPos;
-uniform vec3 lightSourcesDirPosArr[2];
-uniform vec3 lightSourcesColorArr[2];
+uniform vec3 lightSourcesDirPosArr[100];
+uniform vec3 lightSourcesColorArr[100];
 uniform float specularExponent;
-uniform bool isDirectional[2];
+uniform bool isDirectional[4];
 
 // For flashlight:
 uniform vec3 flashlightPosition;
@@ -24,7 +25,7 @@ uniform float flashlightCutOff;
 
 void main(void)
 {
-	vec3 ambient = vec3(0.0,0.0,0.0);
+	vec3 ambient = vec3(0.2,0.2,0.2);
 	float shade = 0.0f;
 	vec3 color = vec3(0,0,0);
 	vec3 totcolor = vec3(0,0,0);
@@ -34,6 +35,7 @@ void main(void)
 	float specStrength = 0.5f;
 	float spec = 0.0f;
 	totcolor += ambient;
+
 
 	// --------- FlashLight ------------
 	vec3 flashDir = normalize(flashlightPosition - outPosition);
@@ -51,26 +53,17 @@ void main(void)
 	}
 
 	// ---------------------------------
-	for (int i = 0; i<= 1; i++)
-	{
-		if (isDirectional[i])
-		{
-			light = normalize(lightSourcesDirPosArr[i]);
-			shade = dot(normalize(fragnormal), light);
-			shade = clamp(shade, 0, 1);
-			color = shade*lightSourcesColorArr[i];
-			totcolor += color;
 
-		}
-		else
-		{
-			dist = distance(lightSourcesDirPosArr[i], outPosition);
-			light = normalize(lightSourcesDirPosArr[i] - outPosition)/dist*30;
-			shade = dot(normalize(fragnormal), light);
-			shade = clamp(shade, 0, 1);
-			color = shade*lightSourcesColorArr[i];
-			totcolor += color;
-		}
+	for (int i = 0; i < LightBallsQuantity; i++)
+	{
+
+		dist = distance(lightSourcesDirPosArr[i], outPosition);
+		light = normalize(lightSourcesDirPosArr[i] - outPosition)/dist;
+		shade = dot(normalize(fragnormal), light);
+		shade = clamp(shade, 0, 1);
+		color = shade*lightSourcesColorArr[i];
+		totcolor += color;
+
 
 		// Specular shade
 		vec3 r = reflect(-light, fragnormal);
@@ -85,7 +78,7 @@ void main(void)
 			color = spec*lightSourcesColorArr[i];
 					totcolor += color;
 		}
-		
+
 	}
 
 	totcolor = clamp(totcolor, 0, 1);
