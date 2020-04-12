@@ -41,14 +41,15 @@ void drawLightBall(LightBall* lightball, mat4 projectionMatrix){
 	glEnableVertexAttribArray(glGetAttribLocation(lightball->shader, "projectionMatrix"));
 };
 
-void displayLightBall(LightBall* lightball, mat4 wtvMatrix, mat4 trans, mat4 rot1) {
+void displayLightBall(LightBall* lightball, mat4 * wtvMatrixp, mat4 trans, mat4 rot1) {
   glUseProgram(lightball->shader);
-	glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
+  mat4 wtvMatrix = *wtvMatrixp;
+  glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;
-	total = Mult(trans, rot1);
-	glBindTexture(GL_TEXTURE_2D, lightball->texture);
-	glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(lightball->model, lightball->shader, "in_Position", "in_Normal", "inTexCoord");
+  total = Mult(trans, rot1);
+  glBindTexture(GL_TEXTURE_2D, lightball->texture);
+  glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+  DrawModel(lightball->model, lightball->shader, "in_Position", "in_Normal", "inTexCoord");
 };
 
 

@@ -12,10 +12,9 @@ uniform sampler2D dirttex;
 //For ball:
 uniform int LightBallsQuantity;
 uniform vec3 camPos;
-uniform vec3 lightSourcesDirPosArr[100];
-uniform vec3 lightSourcesColorArr[100];
+uniform vec3 lightBallsPositions[100];
+uniform vec3 lightBallsColor[100];
 uniform float specularExponent;
-uniform bool isDirectional[4];
 
 // For flashlight:
 uniform vec3 flashlightPosition;
@@ -57,11 +56,11 @@ void main(void)
 	for (int i = 0; i < LightBallsQuantity; i++)
 	{
 
-		dist = distance(lightSourcesDirPosArr[i], outPosition);
-		light = normalize(lightSourcesDirPosArr[i] - outPosition)/dist;
+		dist = distance(lightBallsPositions[i], outPosition);
+		light = normalize(lightBallsPositions[i] - outPosition)/dist;
 		shade = dot(normalize(fragnormal), light);
 		shade = clamp(shade, 0, 1);
-		color = shade*lightSourcesColorArr[i];
+		color = shade*lightBallsColor[i];
 		totcolor += color;
 
 
@@ -75,7 +74,7 @@ void main(void)
 			float exp = specularExponent;
 			spec = max(spec, 0.01);
 			spec = pow(spec, specularExponent);
-			color = spec*lightSourcesColorArr[i];
+			color = spec*lightBallsColor[i];
 					totcolor += color;
 		}
 
@@ -85,10 +84,4 @@ void main(void)
 	vec4 textemp = texture(dirttex, texCoord);
 	outColor = vec4(totcolor.x*textemp.x, totcolor.y*textemp.y, totcolor.z*textemp.z, 1);
 
-
-	//before ball:
-	//vec3 light = vec3(0.58, 0.58, 0.58);
-	//float shade = dot(light, normalize(fragnormal));
-	//shade = clamp(shade, 0, 1);
-	//outColor = shade*texture(dirttex, texCoord);
 }
