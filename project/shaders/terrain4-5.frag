@@ -14,6 +14,7 @@ uniform int LightBallsQuantity;
 uniform vec3 camPos;
 uniform vec3 lightBallsPositions[100];
 uniform vec3 lightBallsColor[100];
+uniform float lightBallsIntensities[100];
 uniform float specularExponent;
 
 // For flashlight:
@@ -57,7 +58,7 @@ void main(void)
 	{
 
 		dist = distance(lightBallsPositions[i], outPosition);
-		light = normalize(lightBallsPositions[i] - outPosition)/dist;
+		light = normalize(lightBallsPositions[i] - outPosition)/dist*lightBallsIntensities[i];
 		shade = dot(normalize(fragnormal), light);
 		shade = clamp(shade, 0, 1);
 		color = shade*lightBallsColor[i];

@@ -13,10 +13,12 @@ void initLightBall(LightBall* this, mat4 projectionMatrix) {
   printError("init lightball shader");
   this->position = SetVector(0,0,0);
   this->active = true;
+  this->flying = true;
   this->model = LoadModelPlus("models/groundsphere.obj");
+  this->intensity = 1;
+  this->lifeTimer = 20;
 
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-  glUniform1i(glGetUniformLocation(this->shader, "texture"), 0); // Texture unit 0
 
   printError("init lightball");
 
@@ -32,7 +34,6 @@ LightBall* createLightBall(mat4 projectionMatrix) {
 
 void drawLightBall(LightBall* lightball, mat4 projectionMatrix){
   glUseProgram(lightball->shader);
-	glUniform1i(glGetUniformLocation(lightball->shader, "texUnit"), 0); // Texture unit 0
 	glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glEnableVertexAttribArray(glGetAttribLocation(lightball->shader, "projectionMatrix"));
 };

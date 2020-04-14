@@ -8,12 +8,14 @@
 //typedef struct {} Terrain;
 
 typedef struct LightBall {
-  GLuint texture; // terrain
   Model *model;
   GLuint shader;
   vec3 position;
   vec3 direction;
   bool active;
+  bool flying;
+  float intensity;
+  int lifeTimer;
 } LightBall;
 
 
