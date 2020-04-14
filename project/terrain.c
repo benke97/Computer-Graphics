@@ -19,12 +19,12 @@ void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height
   glBindTexture(GL_TEXTURE_2D, this->dirttex);
   if (heightmap == 1)
   {
-  	LoadTGATextureData("textures/test2.tga", &this->ttex);
+  	LoadTGATextureData("textures/floor.tga", &this->ttex);
   	this->tm = GenerateTerrain(&this->ttex, this, height);
   }
   else
   {
-  	LoadTGATextureData("textures/tak2.tga", &this->ttex);
+  	LoadTGATextureData("textures/roof.tga", &this->ttex);
   	this->tm = GenerateTerrain(&this->ttex, this, height);
   }
   printError("init terrain");
