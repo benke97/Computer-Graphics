@@ -13,14 +13,12 @@ void initLightBall(LightBall* this, mat4 projectionMatrix) {
   printError("init lightball shader");
   this->position = SetVector(0,0,0);
   this->active = true;
+  this->flying = true;
   this->model = LoadModelPlus("models/groundsphere.obj");
+  this->intensity = 1;
+  this->lifeTimer = 20;
 
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-  glUniform1i(glGetUniformLocation(this->shader, "texture"), 0); // Texture unit 0
-  LoadTGATextureSimple("textures/conc.tga", &this->texture);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, this->texture);
 
   printError("init lightball");
 
@@ -36,7 +34,6 @@ LightBall* createLightBall(mat4 projectionMatrix) {
 
 void drawLightBall(LightBall* lightball, mat4 projectionMatrix){
   glUseProgram(lightball->shader);
-	glUniform1i(glGetUniformLocation(lightball->shader, "texUnit"), 0); // Texture unit 0
 	glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
 	glEnableVertexAttribArray(glGetAttribLocation(lightball->shader, "projectionMatrix"));
 };
@@ -47,7 +44,6 @@ void displayLightBall(LightBall* lightball, mat4 * wtvMatrixp, mat4 trans, mat4 
   glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;
   total = Mult(trans, rot1);
-  glBindTexture(GL_TEXTURE_2D, lightball->texture);
   glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
   DrawModel(lightball->model, lightball->shader, "in_Position", "in_Normal", "inTexCoord");
 };

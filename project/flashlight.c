@@ -1,20 +1,30 @@
 #include "FlashLight.h"
 #include "GL_utilities.h"
+#include <math.h>
 
-void initFlashLight (FlashLight * FlashLight, vec3* pos, vec3* dir) {
-  FlashLight->position = pos;
-  FlashLight->direction = dir;
-  FlashLight->cutOffAngle = cos(M_PI/12);
+void initFlashLight (FlashLight * FlashLight, User* user) {
+  FlashLight__updatePosition(FlashLight, user);
+  FlashLight__updateDirection(FlashLight, user);
+  FlashLight->cutOffAngle = cos(M_PI/13);
+  FlashLight->outerCutOff = cos(M_PI/9);
 }
 
-FlashLight * createFlashLight(vec3* pos, vec3* dir){
+FlashLight * createFlashLight(User* user){
   FlashLight* result = (FlashLight*) malloc(sizeof(FlashLight));
-  initFlashLight(result, pos, dir);
+  initFlashLight(result, user);
 
   return result;
 }
 
-void FlashLight__setDirection(FlashLight* flashlight, vec3* dir)
+void FlashLight__updateDirection(FlashLight* flashlight, User* user)
 {
-  flashlight->direction = dir;
+  flashlight->direction = VectorSub(user->lookAtPoint, user->cam);
+}
+
+void FlashLight__updatePosition(FlashLight* flashlight, User* user)
+{
+  vec3 sideOffset = ScalarMult(Normalize(user->side_movement), 0.3);
+  vec3 yOffset = {0, 0.3, 0};
+	vec3 posOffset = VectorSub(VectorSub(user->cam, yOffset), sideOffset);
+  flashlight->position = posOffset;
 }

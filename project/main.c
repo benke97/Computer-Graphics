@@ -38,8 +38,8 @@ void init(void)
 	lightballhandler = createLightBallHandler();
 
 	// Place flashlight on user position with direction of lookAtPoint
-  vec3 dir = VectorSub(user->lookAtPoint, user->cam);
-	flashlight = createFlashLight(&user->cam, &dir);
+  //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
+	flashlight = createFlashLight(user);
 
 }
 
@@ -61,6 +61,7 @@ void display(void)
 
   glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
+	glUniform1fv(glGetUniformLocation(terrain->shader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
 	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
 	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), user->cam.x, user->cam.y, user->cam.z);
@@ -72,20 +73,24 @@ void display(void)
 
 
 //LightBalls
+	CheckLighballsCollisions (lightballhandler, terrain, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
  	RemoveLightBalls(lightballhandler);
 
   // FlashLight
   glUseProgram(terrain->shader);
 
-  vec3 dir = VectorSub(user->lookAtPoint, user->cam);
-  FlashLight__setDirection(flashlight, &dir);
+  FlashLight__updateDirection(flashlight, user);
+	FlashLight__updatePosition(flashlight, user);
 
-  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightPosition"), flashlight->position->x, flashlight->position->y, flashlight->position->z);
-  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightDirection"), flashlight->direction->x, flashlight->direction->y, flashlight->direction->z);
+  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
+  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
   glUniform1f(glGetUniformLocation(terrain->shader, "flashlightCutOff"), flashlight->cutOffAngle);
+	glUniform1f(glGetUniformLocation(terrain->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 
 
+	//printf("innercutoff %f\n", flashlight->cutOffAngle);
+  //printf("outercutoff %f\n", flashlight->outerCutOff);
 	printError("display 2");
 	glutSwapBuffers();
 }

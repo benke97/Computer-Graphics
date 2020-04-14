@@ -1,5 +1,6 @@
 #ifdef __APPLE__
 	#include <OpenGL/gl3.h>
+	#define GLUT_KEY_LEFT_SHIFT GLUT_KEY_TAB
 	// Linking hint for Lightweight IDE
 	// uses framework Cocoa
 #endif
@@ -124,82 +125,108 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 {
 	vec3 a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
 	vec3 tmp = VectorSub(user->cam, a);
+	vec3 upVector = {0.0, 1.0, 0.0};
+	vec3 normel = {0.0, 1.0, 0.0};
+	GLfloat slope = 0.0;
+	float slopethreshold = 0.4;
 	switch(move)
 	{
 		case(1): //framåt "w"
 			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
 			tmp = VectorSub(user->cam, a);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
 			{
-				return false;
+			 return true;
+			}
+			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			slope = DotProduct(normel,upVector);
+			printf("slope %f\n", slope);
+			//vec3 tmp2 = VectorSub(user->cam, ScalarMult(a,10));
+			//&& slope(user->cam.x,user->cam.y,tmp2.x,tmp2.y,floor->texwidth, roof) < 2
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			{
+				return true;
 			}
 			else
 			{
-				return true;
+				return false;
 			}
 		break;
 
 		case(2): //bakåt "s"
 			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
 			tmp = VectorAdd(user->cam, a);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
 			{
-				return false;
+			 return true;
+			}
+			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			slope = DotProduct(normel,upVector);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			{
+				return true;
 			}
 			else
 			{
-				return true;
+				return false;
 			}
 		break;
 
 		case(3): //höger "d"
 			tmp = VectorSub(user->cam, user->side_movement);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
 			{
-				return false;
+			 return true;
+			}
+			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			slope = DotProduct(normel,upVector);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			{
+				return true;
 			}
 			else
 			{
-				return true;
+				return false;
 			}
 		break;
 
 		case(4): //vänster "a"
 			tmp = VectorAdd(user->cam, user->side_movement);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
 			{
-				return false;
+			 return true;
+			}
+			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			slope = DotProduct(normel,upVector);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			{
+				return true;
 			}
 			else
 			{
-				return true;
+				return false;
 			}
 		break;
 
 		case(5): //snabb framåt "shift + w"
 			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
 			tmp = VectorSub(user->cam, a);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) < 3.0)
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
 			{
-				return false;
+			 return true;
 			}
-			else
+			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			slope = DotProduct(normel,upVector);
+			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
 			{
 				return true;
 			}
+			else
+			{
+				return false;
+			}
 		break;
 	}
-	/*
-	//bakåt "s"
-		case 2:
-			break;
-		//vänster "a"
-		case 3:
-			break;
-		//höger "d"
-		case 4:
-			break;
-		//snabb fram "w+shift"
-		case 5:
-		break;*/
+
+	return false;
 }
