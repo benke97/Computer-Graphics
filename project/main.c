@@ -61,6 +61,7 @@ void display(void)
 
   glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
+	glUniform1fv(glGetUniformLocation(terrain->shader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
 	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
 	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), user->cam.x, user->cam.y, user->cam.z);
@@ -72,6 +73,7 @@ void display(void)
 
 
 //LightBalls
+	CheckLighballsCollisions (lightballhandler, terrain, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
  	RemoveLightBalls(lightballhandler);
 

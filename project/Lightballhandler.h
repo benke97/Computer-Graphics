@@ -12,6 +12,7 @@
 typedef struct LightBallHandler {
   vec3 lightBallsColor[100];
   vec3 lightBallsPositions[100];
+  float lightBallsIntensities[100];
   LightBall lightballs[100];
   int LightBallsQuantity;
   int timeUntilNextBall;
@@ -22,6 +23,7 @@ typedef struct LightBallHandler {
 void initLightBallHandler(LightBallHandler*);
 LightBallHandler* createLightBallHandler();
 void RemoveLightBalls(LightBallHandler*);
+void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * floor, Terrain * roof);
 void MoveAllLightBalls(LightBallHandler*, mat4*);
 void CheckForNewLightBalls (LightBallHandler*, User *, mat4);
 

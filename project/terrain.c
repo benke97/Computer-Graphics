@@ -42,13 +42,11 @@ Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height){
 
 Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 {
-  //TextureData* tex = &this->ttex;
 	int vertexCount = tex->width * tex->height;
 	int triangleCount = (tex->width-1) * (tex->height-1) * 2;
 	int x, z;
 	terrain->texwidth = tex->width;
 	terrain->texheight = tex->height;
-  //GLfloat * vertexArray = this->vertexArray;
 
 	terrain->vertexArray = (GLfloat *)malloc(sizeof(GLfloat) * 3 * vertexCount);
 	terrain->normalArray = (GLfloat *)malloc(sizeof(GLfloat) * 3 * vertexCount);
