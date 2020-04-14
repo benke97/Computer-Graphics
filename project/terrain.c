@@ -5,7 +5,6 @@
 #include "LoadTGA.h"
 #include "GL_utilities.h"
 
-//Model* GenerateTerrain();
 
 void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height){
   this->shader = loadShaders("shaders/terrain4-5.vert", "shaders/terrain4-5.frag");
@@ -13,14 +12,10 @@ void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height
   glUseProgram(this->shader);
   printError("init shader");
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-  glUniform1i(glGetUniformLocation(this->shader, "tex"), 0); // Texture unit 0
-  glUniform1i(glGetUniformLocation(this->shader, "dirttex"), 1);
-  LoadTGATextureSimple("textures/grass.tga", &this->tex1);
+  glUniform1i(glGetUniformLocation(this->shader, "dirttex"), 0);
   LoadTGATextureSimple("textures/dirt.tga", &this->dirttex);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, this->tex1);
-  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, this->dirttex);
   if (heightmap == 1)
   {
