@@ -24,7 +24,7 @@ typedef struct Terrain {
 
 void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height);
 Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height);
-Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height);
+Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height, int sign);
 float heightFinder(float xPos, float zPos, int texwith, Terrain* terrain);
 float heightdiff(float xPos, float zPos, int texwidth, Terrain* roof, Terrain* floor);
 float slidedown(float xPos1, float zPos1, float xPos2, float zPos2,int texwidth, Terrain* floor);

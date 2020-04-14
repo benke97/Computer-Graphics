@@ -51,9 +51,11 @@ void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * flo
 
     float floorheight = heightFinder(x, z, floor->texwidth, floor);
     float roofheight = heightFinder(x, z, roof->texwidth, roof);
+    vec3 floorNormal = getNormal(x, z, floor->texwidth, floor);
+    vec3 roofNormal = getNormal(x, z, roof->texwidth, roof);
 
 //    if(lightball->position.y < floorheight || lightball->position.y > roofheight - 1){
-    if(lightball->position.y < floorheight || lightball->position.y > roofheight +1){
+    if(lightball->position.y < floorheight || lightball->position.y > roofheight - 5){
 
       lightball->flying = false;
       if (lightball->lifeTimer > 1) {
@@ -66,14 +68,14 @@ void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * flo
       lightball->lifeTimer--;
 
 
-/*
+
       if(lightball->position.y < floorheight ) {
-      lightballhandler->lightBallsPositions[ball] = VectorSub(lightball->position, ScalarMult(lightball->direction, 1));
+      lightballhandler->lightBallsPositions[ball] = VectorSub(lightball->position, ScalarMult(floorNormal, -1));
       }
       else {
-        lightballhandler->lightBallsPositions[ball] = VectorSub(lightball->position, ScalarMult(lightball->direction, -2));
+        lightballhandler->lightBallsPositions[ball] = VectorSub(lightball->position, ScalarMult(roofNormal, -3));
       }
-      */
+
     }
 
   }
