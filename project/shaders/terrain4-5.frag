@@ -6,7 +6,7 @@ in vec2 texCoord;
 in vec3 fragnormal;
 in vec3 outPosition;
 
-uniform sampler2D tex;
+//uniform sampler2D tex;
 uniform sampler2D dirttex;
 
 //For ball:
