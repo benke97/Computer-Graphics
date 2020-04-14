@@ -21,6 +21,7 @@ uniform float specularExponent;
 uniform vec3 flashlightPosition;
 uniform vec3 flashlightDirection;
 uniform float flashlightCutOff;
+uniform float flashlightOuterCutOff;
 
 
 void main(void)
@@ -38,19 +39,42 @@ void main(void)
 
 
 	// --------- FlashLight ------------
-	vec3 flashDir = normalize(flashlightPosition - outPosition);
-	float theta = dot(flashDir, normalize(-flashlightDirection));
+	vec3 flashDir 	= normalize(flashlightPosition - outPosition);
+
+	float theta 		= dot(flashDir, normalize(-flashlightDirection));
+	float epsilon   = flashlightCutOff - flashlightOuterCutOff;
+	float intensity = clamp((theta - flashlightOuterCutOff) / epsilon, 0.0, 1.0);
 
 	if (theta > flashlightCutOff)
 	{
 		dist = distance(flashlightPosition, outPosition);
 		color = vec3(4/dist, 4/dist, 4/dist);
+
+
 		color.x = clamp(color.x, 0, 0.8);
 		color.y = clamp(color.y, 0, 0.8);
 		color.z = clamp(color.z, 0, 0.8);
 
 		totcolor += color;
 	}
+	if( theta > flashlightOuterCutOff)
+	{
+		if (theta < flashlightCutOff)
+		{
+			dist = distance(flashlightPosition, outPosition);
+			color = vec3(4/dist, 4/dist, 4/dist);
+			color.x = clamp(color.x, 0, 0.8);
+			color.y = clamp(color.y, 0, 0.8);
+			color.z = clamp(color.z, 0, 0.8);
+
+			totcolor += intensity * color;
+		}
+
+	}
+
+
+	// outercolor
+
 
 	// ---------------------------------
 
@@ -76,7 +100,7 @@ void main(void)
 			spec = max(spec, 0.01);
 			spec = pow(spec, specularExponent);
 			color = spec*lightBallsColor[i];
-					totcolor += color;
+			totcolor += color;
 		}
 
 	}

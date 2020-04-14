@@ -49,7 +49,7 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 	terrain->texheight = tex->height;
 
 	terrain->vertexArray = (GLfloat *)malloc(sizeof(GLfloat) * 3 * vertexCount);
-	GLfloat *normalArray = malloc(sizeof(GLfloat) * 3 * vertexCount);
+	terrain->normalArray = (GLfloat *)malloc(sizeof(GLfloat) * 3 * vertexCount);
 	GLfloat *texCoordArray = malloc(sizeof(GLfloat) * 2 * vertexCount);
 	GLuint *indexArray = malloc(sizeof(GLuint) * triangleCount*3);
 
@@ -62,9 +62,9 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 			terrain->vertexArray[(x + z * tex->width)*3 + 1] = tex->imageData[(x + z * tex->width) * (tex->bpp/8)]/ 10.0 + height;
 			terrain->vertexArray[(x + z * tex->width)*3 + 2] = z / 1.0;
 // Normal vectors. You need to calculate these.
-			normalArray[(x + z * tex->width)*3 + 0] = 0.0;
-			normalArray[(x + z * tex->width)*3 + 1] = 1.0;
-			normalArray[(x + z * tex->width)*3 + 2] = 0.0;
+			terrain->normalArray[(x + z * tex->width)*3 + 0] = 0.0;
+			terrain->normalArray[(x + z * tex->width)*3 + 1] = 1.0;
+			terrain->normalArray[(x + z * tex->width)*3 + 2] = 0.0;
 // Texture coordinates. You may want to scale them.
 			texCoordArray[(x + z * tex->width)*2 + 0] = x; // (float)x / tex->width;
 			texCoordArray[(x + z * tex->width)*2 + 1] = z; // (float)z / tex->height;
@@ -86,9 +86,9 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 		{
 			if (x < 1 || x > tex->width - 1 || z < 1 || z > tex->height - 1)
 			{
-				normalArray[(x + z * tex->width)*3 + 0] = 0;
-				normalArray[(x + z * tex->width)*3 + 1] = 1;
-				normalArray[(x + z * tex->width)*3 + 2] = 0;
+				terrain->normalArray[(x + z * tex->width)*3 + 0] = 0;
+				terrain->normalArray[(x + z * tex->width)*3 + 1] = 1;
+				terrain->normalArray[(x + z * tex->width)*3 + 2] = 0;
 			}
 			else
 			{
@@ -106,9 +106,9 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 				N.y = 2.0;
 				N = Normalize(N);
 	// Normal vectors.
-				normalArray[(x + z * tex->width)*3 + 0] = N.x;
-				normalArray[(x + z * tex->width)*3 + 1] = N.y;
-				normalArray[(x + z * tex->width)*3 + 2] = N.z;
+				terrain->normalArray[(x + z * tex->width)*3 + 0] = N.x;
+				terrain->normalArray[(x + z * tex->width)*3 + 1] = N.y;
+				terrain->normalArray[(x + z * tex->width)*3 + 2] = N.z;
 			}
 		}
 
@@ -118,7 +118,7 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 
 	Model* model = LoadDataToModel(
 			terrain->vertexArray,
-			normalArray,
+			terrain->normalArray,
 			texCoordArray,
 			NULL,
 			indexArray,
@@ -192,4 +192,24 @@ float heightdiff(float xPos, float zPos, int texwidth, Terrain* roof, Terrain* f
   float roofheight = heightFinder(xPos,zPos,texwidth,roof);
   float floorheight = heightFinder(xPos,zPos,texwidth,floor);
   return roofheight - floorheight;
+}
+
+float slidedown(float xPos1, float zPos1, float xPos2, float zPos2,int texwidth, Terrain* floor)
+{
+  if (heightFinder(xPos1,zPos1,floor->texwidth, floor) < heightFinder(xPos2, zPos2, floor->texwidth, floor))
+  {
+   return true;
+  }
+  return false;
+}
+
+vec3 getNormal(float xPos, float zPos, int texwidth, Terrain* floor)
+{
+  vec3 norm = {0.0, 0.0, 0.0};
+  int x = round(xPos);
+  int z = round(zPos);
+  norm.x = floor->normalArray[(x + z * texwidth)*3 + 0];
+  norm.y = floor->normalArray[(x + z * texwidth)*3 + 1];
+  norm.z = floor->normalArray[(x + z * texwidth)*3 + 2];
+  return norm;
 }
