@@ -19,7 +19,7 @@ typedef struct Terrain {
   Model *tm;
   // Reference to shader this->shader
   GLuint shader;
-  GLuint tex1, dirttex;
+  GLuint dirttex;
 } Terrain;
 
 void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height);
