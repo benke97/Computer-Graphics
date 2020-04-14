@@ -28,7 +28,6 @@ Model* GenerateTerrain(TextureData *tex)
 	GLfloat *normalArray = malloc(sizeof(GLfloat) * 3 * vertexCount);
 	GLfloat *texCoordArray = malloc(sizeof(GLfloat) * 2 * vertexCount);
 	GLuint *indexArray = malloc(sizeof(GLuint) * triangleCount*3);
-
 	printf("bpp %d\n", tex->bpp);
 	for (x = 0; x < tex->width; x++)
 		for (z = 0; z < tex->height; z++)

@@ -10,6 +10,7 @@
 
 typedef struct Terrain {
   GLfloat *vertexArray;
+  GLfloat *normalArray;
   int texwidth;
   int texheight;
 
@@ -26,4 +27,6 @@ Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height);
 Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height);
 float heightFinder(float xPos, float zPos, int texwith, Terrain* terrain);
 float heightdiff(float xPos, float zPos, int texwidth, Terrain* roof, Terrain* floor);
+float slidedown(float xPos1, float zPos1, float xPos2, float zPos2,int texwidth, Terrain* floor);
+vec3 getNormal(float xPos, float zPos, int texwidth, Terrain* floor);
 #endif

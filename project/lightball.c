@@ -17,6 +17,10 @@ void initLightBall(LightBall* this, mat4 projectionMatrix) {
 
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
   glUniform1i(glGetUniformLocation(this->shader, "texture"), 0); // Texture unit 0
+  LoadTGATextureSimple("textures/conc.tga", &this->texture);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, this->texture);
 
   printError("init lightball");
 
@@ -43,6 +47,7 @@ void displayLightBall(LightBall* lightball, mat4 * wtvMatrixp, mat4 trans, mat4 
   glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;
   total = Mult(trans, rot1);
+  glBindTexture(GL_TEXTURE_2D, lightball->texture);
   glUniformMatrix4fv(glGetUniformLocation(lightball->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
   DrawModel(lightball->model, lightball->shader, "in_Position", "in_Normal", "inTexCoord");
 };
