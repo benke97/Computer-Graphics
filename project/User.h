@@ -9,6 +9,7 @@ typedef struct User {
   vec3 upVector;
   vec3 side_movement;
   bool lightball_shooting_activated;
+  int speed;
 } User;
 
 void mouse(int x, int y);
