@@ -81,14 +81,16 @@ void main(void)
 	for (int i = 0; i < LightBallsQuantity; i++)
 	{
 
-		dist = distance(lightBallsPositions[i], outPosition);
+		dist = distance(lightBallsPositions[i], outPosition) * 4;
 		light = normalize(lightBallsPositions[i] - outPosition)/dist*lightBallsIntensities[i];
+		//shade = abs(dot(normalize(fragnormal), light));
 		shade = dot(normalize(fragnormal), light);
+
 		shade = clamp(shade, 0, 1);
 		color = shade*lightBallsColor[i];
 		totcolor += color;
 
-
+		/*
 		// Specular shade
 		vec3 r = reflect(-light, fragnormal);
 		//vec3 r = 2*fragnormal*dot(light, fragnormal) - light;
@@ -102,6 +104,7 @@ void main(void)
 			color = spec*lightBallsColor[i];
 			totcolor += color;
 		}
+		*/
 
 	}
 

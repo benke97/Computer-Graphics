@@ -20,12 +20,13 @@ void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height
   if (heightmap == 1)
   {
   	LoadTGATextureData("textures/floor.tga", &this->ttex);
-  	this->tm = GenerateTerrain(&this->ttex, this, height);
+  	this->tm = GenerateTerrain(&this->ttex, this, height, 1);
+
   }
   else
   {
   	LoadTGATextureData("textures/roof.tga", &this->ttex);
-  	this->tm = GenerateTerrain(&this->ttex, this, height);
+  	this->tm = GenerateTerrain(&this->ttex, this, height, -1);
   }
   printError("init terrain");
 }
@@ -40,7 +41,7 @@ Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height){
 
 
 
-Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
+Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height, int sign)
 {
 	int vertexCount = tex->width * tex->height;
 	int triangleCount = (tex->width-1) * (tex->height-1) * 2;
@@ -106,9 +107,9 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height)
 				N.y = 2.0;
 				N = Normalize(N);
 	// Normal vectors.
-				terrain->normalArray[(x + z * tex->width)*3 + 0] = N.x;
-				terrain->normalArray[(x + z * tex->width)*3 + 1] = N.y;
-				terrain->normalArray[(x + z * tex->width)*3 + 2] = N.z;
+				terrain->normalArray[(x + z * tex->width)*3 + 0] = N.x*sign;
+				terrain->normalArray[(x + z * tex->width)*3 + 1] = N.y*sign;
+				terrain->normalArray[(x + z * tex->width)*3 + 2] = N.z*sign;
 			}
 		}
 
