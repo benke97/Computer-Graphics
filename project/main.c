@@ -40,7 +40,9 @@ void init(void)
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
-
+  LoadTGATextureSimple("textures/stoneee.tga", &terrain->dirttex);
+	LoadTGATextureSimple("textures/stoneee.tga", &roof->dirttex);
+	LoadTGATextureSimple("textures/fonarik_low_Albedo.tga", &flashlight->texture);
 }
 
 void display(void)
@@ -56,9 +58,7 @@ void display(void)
 	glUseProgram(terrain->shader);
 	modelView = IdentityMatrix();
 	total = Mult(camMatrix, modelView);
-
 	CheckForNewLightBalls(lightballhandler, user, projectionMatrix);
-
   glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
 	glUniform1fv(glGetUniformLocation(terrain->shader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
@@ -67,8 +67,12 @@ void display(void)
 	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), user->cam.x, user->cam.y, user->cam.z);
 	glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
 
+	glBindTexture(GL_TEXTURE_2D, terrain->dirttex);
 	DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
+
 	glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+
+	glBindTexture(GL_TEXTURE_2D, roof->dirttex);
 	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
 
 
@@ -88,7 +92,17 @@ void display(void)
   glUniform1f(glGetUniformLocation(terrain->shader, "flashlightCutOff"), flashlight->cutOffAngle);
 	glUniform1f(glGetUniformLocation(terrain->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 
-
+	mat4 rot1 = Ry(-angle+ M_PI/2);
+	mat4 rot2 = Rx(-yangle);
+	mat4 rot = Mult(rot1,rot2);
+	printf("angle %f\n", angle);
+	glUseProgram(flashlight->shader);
+	mat4 trans = T(flashlight->position.x + flashlight->direction.x/1.5, flashlight->position.y + flashlight->direction.y/1.5, flashlight->position.z + flashlight->direction.z/1.5);
+	mat4 scale = S(0.007,0.007,0.007);
+	mat4 tot = Mult(trans,scale);
+	glBindTexture(GL_TEXTURE_2D, flashlight->texture);
+	drawFlashlight(flashlight, projectionMatrix);
+	displayFlashlight(flashlight, &camMatrix,tot,rot);
 	//printf("innercutoff %f\n", flashlight->cutOffAngle);
   //printf("outercutoff %f\n", flashlight->outerCutOff);
 	printError("display 2");

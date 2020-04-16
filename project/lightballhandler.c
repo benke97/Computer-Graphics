@@ -27,7 +27,7 @@ void CheckForNewLightBalls (LightBallHandler* lightballhandler, User * user, mat
     LightBall * lightball;
 
     lightball = createLightBall(projectionMatrix);
-    lightballhandler->lightBallsColor[lightballhandler->LightBallsQuantity] = SetVector(1.0f, 1.0f, 1.0f);
+    lightballhandler->lightBallsColor[lightballhandler->LightBallsQuantity] = SetVector(1.0f, 0.0f, 0.0f);
     lightball->position = user->cam;
     lightballhandler->lightBallsPositions[lightballhandler->LightBallsQuantity] = lightball->position;
     lightballhandler->lightBallsIntensities[lightballhandler->LightBallsQuantity] = lightball->intensity;
