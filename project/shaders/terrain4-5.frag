@@ -7,7 +7,7 @@ in vec3 fragnormal;
 in vec3 outPosition;
 
 //uniform sampler2D tex;
-uniform sampler2D dirttex;
+uniform sampler2D terrain_texture;
 
 //For ball:
 uniform int LightBallsQuantity;
@@ -109,7 +109,7 @@ void main(void)
 	}
 
 	totcolor = clamp(totcolor, 0, 1);
-	vec4 textemp = texture(dirttex, texCoord);
+	vec4 textemp = texture(terrain_texture, texCoord);
 	outColor = vec4(totcolor.x*textemp.x, totcolor.y*textemp.y, totcolor.z*textemp.z, 1);
 
 }

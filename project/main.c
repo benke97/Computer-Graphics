@@ -10,7 +10,7 @@
 #include "FlashLight.h"
 
 mat4 projectionMatrix;
-Terrain* terrain;
+Terrain* terain_floor;
 Terrain* roof;
 User * user;
 FlashLight* flashlight;
@@ -26,15 +26,12 @@ void init(void)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
-	printf("%d", 5);
-	int heightmap = 1;
-	int height = 0;
-	terrain = createTerrain(projectionMatrix,heightmap,height);
-	heightmap = 0;
-	height = 20;
-	roof = createTerrain(projectionMatrix,heightmap,height);
-	user = createUser();
 
+	bool is_floor = true;
+	terain_floor = createTerrain(projectionMatrix, is_floor);
+	roof = createTerrain(projectionMatrix, !is_floor);
+	
+	user = createUser();
 	lightballhandler = createLightBallHandler();
 
 	// Place flashlight on user position with direction of lookAtPoint
@@ -46,47 +43,34 @@ void init(void)
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	mat4 total, modelView, camMatrix;
+	mat4 camMatrix;
 	camMatrix = lookAt(user->cam.x, user->cam.y, user->cam.z,
 				user->lookAtPoint.x, user->lookAtPoint.y, user->lookAtPoint.z,
 				user->upVector.x, user->upVector.y, user->upVector.z);
-	modelView = IdentityMatrix();
-	total = Mult(camMatrix, modelView);
+
 	printError("pre display");
-	glUseProgram(terrain->shader);
-	modelView = IdentityMatrix();
-	total = Mult(camMatrix, modelView);
 
 	CheckForNewLightBalls(lightballhandler, user, projectionMatrix);
-
-  glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
-	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
-	glUniform1fv(glGetUniformLocation(terrain->shader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
-	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
-	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
-	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), user->cam.x, user->cam.y, user->cam.z);
-	glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-
-	DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
-	glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
-
+	displayLightBallsLight (lightballhandler, terain_floor);
+	displayTerrain(terain_floor, roof, specularExponent, user->cam, &camMatrix);
 
 //LightBalls
-	CheckLighballsCollisions (lightballhandler, terrain, roof);
+	CheckLighballsCollisions (lightballhandler, terain_floor, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
  	RemoveLightBalls(lightballhandler);
 
   // FlashLight
-  glUseProgram(terrain->shader);
+  glUseProgram(terain_floor->shader);
 
   FlashLight__updateDirection(flashlight, user);
 	FlashLight__updatePosition(flashlight, user);
 
-  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
-  glUniform3f(glGetUniformLocation(terrain->shader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
-  glUniform1f(glGetUniformLocation(terrain->shader, "flashlightCutOff"), flashlight->cutOffAngle);
-	glUniform1f(glGetUniformLocation(terrain->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
+  glUniform3f(glGetUniformLocation(terain_floor->shader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
+  glUniform3f(glGetUniformLocation(terain_floor->shader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
+  glUniform1f(glGetUniformLocation(terain_floor->shader, "flashlightCutOff"), flashlight->cutOffAngle);
+	glUniform1f(glGetUniformLocation(terain_floor->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
+
+
 
 
 	//printf("innercutoff %f\n", flashlight->cutOffAngle);
@@ -97,7 +81,7 @@ void display(void)
 
 void timer(int i)
 {
-	userInput(user, roof, terrain);
+	userInput(user, roof, terain_floor);
 	glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH)/ 2,glutGet(GLUT_WINDOW_HEIGHT)/ 2);
 	glutTimerFunc(20, &timer, i);
 	glutPostRedisplay();
