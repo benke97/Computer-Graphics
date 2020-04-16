@@ -1,7 +1,6 @@
 
 #include "Lightballhandler.h"
 
-#include "Terrain.h"
 #include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
@@ -27,7 +26,7 @@ void CheckForNewLightBalls (LightBallHandler* lightballhandler, User * user, mat
     LightBall * lightball;
 
     lightball = createLightBall(projectionMatrix);
-    lightballhandler->lightBallsColor[lightballhandler->LightBallsQuantity] = SetVector(1.0f, 1.0f, 1.0f);
+    lightballhandler->lightBallsColor[lightballhandler->LightBallsQuantity] = SetVector(1.0f, 0.0f, 0.0f);
     lightball->position = user->cam;
     lightballhandler->lightBallsPositions[lightballhandler->LightBallsQuantity] = lightball->position;
     lightballhandler->lightBallsIntensities[lightballhandler->LightBallsQuantity] = lightball->intensity;
@@ -135,4 +134,12 @@ void RemoveLightBalls(LightBallHandler* lightballhandler){
     lightballhandler->lightBallsIntensities[ball] = new_lightBallsIntensities[ball];
     lightballhandler->lightBallsColor[ball] = new_lightBallsColor[ball];
 	}
+}
+
+void displayLightBallsLight (LightBallHandler* lightballhandler, Terrain * terrain) {
+  glUseProgram(terrain->shader);
+  glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
+	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
+	glUniform1fv(glGetUniformLocation(terrain->shader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
+	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
 }

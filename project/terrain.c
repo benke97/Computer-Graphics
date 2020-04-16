@@ -6,35 +6,38 @@
 #include "GL_utilities.h"
 
 
-void initTerrain(Terrain* this, mat4 projectionMatrix, int heightmap, int height){
+void initTerrain(Terrain* this, mat4 projectionMatrix, bool is_floor){
   this->shader = loadShaders("shaders/terrain4-5.vert", "shaders/terrain4-5.frag");
+  this->is_floor = is_floor;
 
   glUseProgram(this->shader);
   printError("init shader");
+
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-  glUniform1i(glGetUniformLocation(this->shader, "dirttex"), 0);
-  LoadTGATextureSimple("textures/dirt.tga", &this->dirttex);
+  glUniform1i(glGetUniformLocation(this->shader, "terrain_texture"), 0);
+  LoadTGATextureSimple("textures/dirt.tga", &this->terrain_texture);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, this->dirttex);
-  if (heightmap == 1)
+  glBindTexture(GL_TEXTURE_2D, this->terrain_texture);
+  if (this->is_floor)
   {
   	LoadTGATextureData("textures/floor.tga", &this->ttex);
+    int height = 0;
   	this->tm = GenerateTerrain(&this->ttex, this, height, 1);
-
   }
   else
   {
   	LoadTGATextureData("textures/roof.tga", &this->ttex);
+    int height = 20;
   	this->tm = GenerateTerrain(&this->ttex, this, height, -1);
   }
   printError("init terrain");
 }
 
-Terrain* createTerrain(mat4 projectionMatrix,int heightmap,int height){
+Terrain* createTerrain(mat4 projectionMatrix, bool is_floor){
 
   Terrain* result = (Terrain*) malloc(sizeof(Terrain));
-  initTerrain(result, projectionMatrix, heightmap, height);
+  initTerrain(result, projectionMatrix, is_floor);
 
   return result;
 }
@@ -213,4 +216,21 @@ vec3 getNormal(float xPos, float zPos, int texwidth, Terrain* floor)
   norm.y = floor->normalArray[(x + z * texwidth)*3 + 1];
   norm.z = floor->normalArray[(x + z * texwidth)*3 + 2];
   return norm;
+}
+
+void displayTerrain(Terrain * terrain, Terrain * roof, float specularExponent, vec3 cam, mat4 * camMatrix) {
+  glUseProgram(terrain->shader);
+  mat4 modelView = IdentityMatrix();
+  mat4 total = Mult(*camMatrix, modelView);
+
+	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
+	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), cam.x, cam.y, cam.z);
+
+  glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+  glBindTexture(GL_TEXTURE_2D, terrain->terrain_texture);
+  DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
+
+  glBindTexture(GL_TEXTURE_2D, roof->terrain_texture);
+  glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
 }

@@ -1,5 +1,4 @@
 #include "Lightball.h"
-#include "Terrain.h"
 #include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"

@@ -8,15 +8,20 @@ typedef struct FlashLight
 {
   vec3 position;
   vec3 direction;
+  vec3 flashpos;
+  Model *model;
+  GLuint shader;
   GLfloat cutOffAngle;
   GLfloat outerCutOff;
+  GLuint texture;
 } FlashLight;
 
 void initFlashLight (FlashLight * FlashLight, User* user);
 FlashLight * createFlashLight(User* user);
 void FlashLight__updateDirection(FlashLight* flashlight, User* user);
 void FlashLight__updatePosition(FlashLight* flashlight, User* user);
-
+void drawFlashlight(FlashLight* flashlight, mat4 projectionMatrix);
+void displayFlashlight(FlashLight* flashlight, mat4 * wtvMatrixp, mat4 trans, mat4 rot1);
 
 
 
