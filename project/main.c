@@ -56,8 +56,6 @@ void display(void)
 	displayLightBallsLight (lightballhandler, terrain_floor);
 	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
 
-
-//LightBalls
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
  	RemoveLightBalls(lightballhandler);

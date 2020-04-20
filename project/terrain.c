@@ -1,6 +1,5 @@
 
 #include "Terrain.h"
-//#include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
 #include "GL_utilities.h"
@@ -21,15 +20,15 @@ void initTerrain(Terrain* this, mat4 projectionMatrix, bool is_floor){
   glBindTexture(GL_TEXTURE_2D, this->terrain_texture);
   if (this->is_floor)
   {
-  	LoadTGATextureData("textures/floor.tga", &this->ttex);
+  	LoadTGATextureData("textures/floor.tga", &this->texData);
     int height = 0;
-  	this->tm = GenerateTerrain(&this->ttex, this, height, 1);
+  	this->terrainModel = GenerateTerrain(&this->texData, this, height, 1);
   }
   else
   {
-  	LoadTGATextureData("textures/roof.tga", &this->ttex);
+  	LoadTGATextureData("textures/roof.tga", &this->texData);
     int height = 20;
-  	this->tm = GenerateTerrain(&this->ttex, this, height, -1);
+  	this->terrainModel = GenerateTerrain(&this->texData, this, height, -1);
   }
   printError("init terrain");
 }
@@ -57,7 +56,6 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height, int sign
 	GLfloat *texCoordArray = malloc(sizeof(GLfloat) * 2 * vertexCount);
 	GLuint *indexArray = malloc(sizeof(GLuint) * triangleCount*3);
 
-	printf("bpp %d\n", tex->bpp);
 	for (x = 0; x < tex->width; x++)
 		for (z = 0; z < tex->height; z++)
 		{
@@ -133,10 +131,11 @@ Model* GenerateTerrain(TextureData* tex, Terrain * terrain, int height, int sign
 }
 
 
-float heightFinder(float xPos, float zPos, int texwidth, Terrain* terrain)
+float heightFinder(float xPos, float zPos, Terrain* terrain)
 {
   int x = (int)xPos;
 	int z = (int)zPos;
+  int texwidth = terrain->texwidth;
 
 	//GLfloat * vertexArray = terrain->vertexArray;
 	//int texwidth = terrain->texwidth;
@@ -191,46 +190,47 @@ float heightFinder(float xPos, float zPos, int texwidth, Terrain* terrain)
 	return (w1*v1.y + w2*v2.y + w3*v3.y);
 }
 
-float heightdiff(float xPos, float zPos, int texwidth, Terrain* roof, Terrain* floor)
+float heightdiff(float xPos, float zPos, Terrain* roof, Terrain* floor)
 {
-  float roofheight = heightFinder(xPos,zPos,texwidth,roof);
-  float floorheight = heightFinder(xPos,zPos,texwidth,floor);
+  float roofheight = heightFinder(xPos,zPos,roof);
+  float floorheight = heightFinder(xPos,zPos,floor);
   return roofheight - floorheight;
 }
 
-float slidedown(float xPos1, float zPos1, float xPos2, float zPos2,int texwidth, Terrain* floor)
+float slidedown(float xPos1, float zPos1, float xPos2, float zPos2, Terrain* floor)
 {
-  if (heightFinder(xPos1,zPos1,floor->texwidth, floor) < heightFinder(xPos2, zPos2, floor->texwidth, floor))
+  if (heightFinder(xPos1,zPos1, floor) < heightFinder(xPos2, zPos2, floor))
   {
    return true;
   }
   return false;
 }
 
-vec3 getNormal(float xPos, float zPos, int texwidth, Terrain* floor)
+vec3 getNormal(float xPos, float zPos, Terrain* terrain)
 {
+  int texwidth = terrain->texwidth;
   vec3 norm = {0.0, 0.0, 0.0};
   int x = round(xPos);
   int z = round(zPos);
-  norm.x = floor->normalArray[(x + z * texwidth)*3 + 0];
-  norm.y = floor->normalArray[(x + z * texwidth)*3 + 1];
-  norm.z = floor->normalArray[(x + z * texwidth)*3 + 2];
+  norm.x = terrain->normalArray[(x + z * texwidth)*3 + 0];
+  norm.y = terrain->normalArray[(x + z * texwidth)*3 + 1];
+  norm.z = terrain->normalArray[(x + z * texwidth)*3 + 2];
   return norm;
 }
 
-void displayTerrain(Terrain * terrain, Terrain * roof, float specularExponent, vec3 cam, mat4 * camMatrix) {
-  glUseProgram(terrain->shader);
+void displayTerrain(Terrain * floor, Terrain * roof, float specularExponent, vec3 cam, mat4 * camMatrix) {
+  glUseProgram(floor->shader);
   mat4 modelView = IdentityMatrix();
   mat4 total = Mult(*camMatrix, modelView);
 
-	glUniform1f(glGetUniformLocation(terrain->shader, "specularExponent"), specularExponent);
-	glUniform3f(glGetUniformLocation(terrain->shader, "camPos"), cam.x, cam.y, cam.z);
+	glUniform1f(glGetUniformLocation(floor->shader, "specularExponent"), specularExponent);
+	glUniform3f(glGetUniformLocation(floor->shader, "camPos"), cam.x, cam.y, cam.z);
 
-  glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-  glBindTexture(GL_TEXTURE_2D, terrain->terrain_texture);
-  DrawModel(terrain->tm, terrain->shader, "inPosition", "inNormal", "inTexCoord");
+  glUniformMatrix4fv(glGetUniformLocation(floor->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+  glBindTexture(GL_TEXTURE_2D, floor->terrain_texture);
+  DrawModel(floor->terrainModel, floor->shader, "inPosition", "inNormal", "inTexCoord");
 
   glBindTexture(GL_TEXTURE_2D, roof->terrain_texture);
   glUniformMatrix4fv(glGetUniformLocation(roof->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(roof->tm, roof->shader, "inPosition", "inNormal", "inTexCoord");
+	DrawModel(roof->terrainModel, roof->shader, "inPosition", "inNormal", "inTexCoord");
 }
