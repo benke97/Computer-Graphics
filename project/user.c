@@ -108,7 +108,7 @@ void userInput(User * user, Terrain * roof, Terrain * floor)
 		}
 	}
 
-	user->cam.y = heightFinder(user->cam.x, user->cam.z, floor->texwidth, floor) + 2;
+	user->cam.y = heightFinder(user->cam.x, user->cam.z, floor) + 2;
 
 	user->lookAtPoint.x = user->cam.x + cos(angle)*cos(yangle);
 	user->lookAtPoint.z = user->cam.z + sin(angle)*cos(yangle);
@@ -135,16 +135,16 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 		case(1): //framåt "w"
 			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
 			tmp = VectorSub(user->cam, a);
-			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor))
 			{
 			 return true;
 			}
-			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			normel = getNormal(tmp.x,tmp.z, floor);
 			slope = DotProduct(normel,upVector);
 			printf("slope %f\n", slope);
 			//vec3 tmp2 = VectorSub(user->cam, ScalarMult(a,10));
 			//&& slope(user->cam.x,user->cam.y,tmp2.x,tmp2.y,floor->texwidth, roof) < 2
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			if (heightdiff(tmp.x, tmp.z, roof, floor) > 3.0 && slope > slopethreshold)
 			{
 				return true;
 			}
@@ -157,13 +157,13 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 		case(2): //bakåt "s"
 			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.1);
 			tmp = VectorAdd(user->cam, a);
-			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor))
 			{
 			 return true;
 			}
-			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			normel = getNormal(tmp.x,tmp.z,floor);
 			slope = DotProduct(normel,upVector);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			if (heightdiff(tmp.x, tmp.z, roof, floor) > 3.0 && slope > slopethreshold)
 			{
 				return true;
 			}
@@ -175,13 +175,13 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 
 		case(3): //höger "d"
 			tmp = VectorSub(user->cam, user->side_movement);
-			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor))
 			{
 			 return true;
 			}
-			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			normel = getNormal(tmp.x,tmp.z,floor);
 			slope = DotProduct(normel,upVector);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			if (heightdiff(tmp.x, tmp.z, roof, floor) > 3.0 && slope > slopethreshold)
 			{
 				return true;
 			}
@@ -193,13 +193,13 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 
 		case(4): //vänster "a"
 			tmp = VectorAdd(user->cam, user->side_movement);
-			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor))
 			{
 			 return true;
 			}
-			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			normel = getNormal(tmp.x,tmp.z,floor);
 			slope = DotProduct(normel,upVector);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			if (heightdiff(tmp.x, tmp.z, roof, floor) > 3.0 && slope > slopethreshold)
 			{
 				return true;
 			}
@@ -212,13 +212,13 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 		case(5): //snabb framåt "shift + w"
 			a = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.5);
 			tmp = VectorSub(user->cam, a);
-			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor->texwidth, floor))
+			if(slidedown(tmp.x,tmp.z,user->cam.x, user->cam.z, floor))
 			{
 			 return true;
 			}
-			normel = getNormal(tmp.x,tmp.z,floor->texwidth,floor);
+			normel = getNormal(tmp.x,tmp.z, floor);
 			slope = DotProduct(normel,upVector);
-			if (heightdiff(tmp.x, tmp.z, roof->texwidth, roof, floor) > 3.0 && slope > slopethreshold)
+			if (heightdiff(tmp.x, tmp.z, roof, floor) > 3.0 && slope > slopethreshold)
 			{
 				return true;
 			}
