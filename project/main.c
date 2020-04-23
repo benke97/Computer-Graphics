@@ -8,14 +8,17 @@
 #include "Terrain.h"
 #include "User.h"
 #include "FlashLight.h"
+#include "Gun.h"
+#include "Laser.h"
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
 Terrain* roof;
 User * user;
 FlashLight* flashlight;
+Gun* gun;
 LightBallHandler* lightballhandler;
-
+Laser* laser;
 GLfloat specularExponent = 100;
 
 
@@ -33,13 +36,15 @@ void init(void)
 
 	user = createUser();
 	lightballhandler = createLightBallHandler();
-
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
+	gun = createGun(user);
+	laser = createLaser(gun);
   LoadTGATextureSimple("textures/stoneee.tga", &terrain_floor->terrain_texture);
 	LoadTGATextureSimple("textures/stoneee.tga", &roof->terrain_texture);
 	LoadTGATextureSimple("textures/fonarik_low_Albedo.tga", &flashlight->texture);
+	LoadTGATextureSimple("textures/Laser_Rifle_Diffuse.tga", &gun->texture);
 }
 
 void display(void)
@@ -56,7 +61,6 @@ void display(void)
 	displayLightBallsLight (lightballhandler, terrain_floor);
 	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
 
-
 //LightBalls
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
@@ -67,6 +71,8 @@ void display(void)
 
   FlashLight__updateDirection(flashlight, user);
 	FlashLight__updatePosition(flashlight, user);
+	Gun__updateDirection(gun, user);
+	Gun__updatePosition(gun, user);
 
   glUniform3f(glGetUniformLocation(terrain_floor->shader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
   glUniform3f(glGetUniformLocation(terrain_floor->shader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
@@ -86,8 +92,26 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, flashlight->texture);
 	drawFlashlight(flashlight, projectionMatrix);
 	displayFlashlight(flashlight, &camMatrix,tot,rot);
+
+
+	glUseProgram(gun->shader);
+	trans = T(gun->position.x + gun->direction.x/1.5, gun->position.y + gun->direction.y/1.5, gun->position.z + gun->direction.z/1.5);
+	scale = S(0.015,0.015,0.015);
+	tot = Mult(trans,scale);
+	rot1 = Ry(-angle+M_PI/2);
+	rot2 = Rx(-yangle);
+	rot = Mult(rot1,rot2);
+	glBindTexture(GL_TEXTURE_2D, gun->texture);
+	drawGun(gun, projectionMatrix);
+	displayGun(gun, &camMatrix,tot,rot);
 	//printf("innercutoff %f\n", flashlight->cutOffAngle);
   //printf("outercutoff %f\n", flashlight->outerCutOff);
+	scale = S(1,1,1);
+	//trans = T(laser->position.x, laser->position.y, laser->position.z);
+	trans = T(gun->position.x + gun->direction.x, gun->position.y + gun->direction.y, gun->position.z + gun->direction.z);
+	rot = Rz(M_PI/2);
+	tot = Mult(trans,scale);
+	displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
 	printError("display 2");
 	glutSwapBuffers();
 }

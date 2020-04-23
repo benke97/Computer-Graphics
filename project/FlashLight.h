@@ -8,7 +8,6 @@ typedef struct FlashLight
 {
   vec3 position;
   vec3 direction;
-  vec3 flashpos;
   Model *model;
   GLuint shader;
   GLfloat cutOffAngle;

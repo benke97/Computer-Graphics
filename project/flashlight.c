@@ -9,14 +9,11 @@ void initFlashLight (FlashLight * FlashLight, User* user) {
   FlashLight->outerCutOff = cos(M_PI/9);
   FlashLight->shader = loadShaders("shaders/flashlight.vert", "shaders/flashlight.frag");
   FlashLight->model = LoadModelPlus("models/flashlight.obj");
-  vec3 torchposition = {user->cam.x + 5,user->cam.y + 5,user->cam.z + 5};
-  FlashLight->flashpos = torchposition;
 }
 
 FlashLight * createFlashLight(User* user){
   FlashLight* result = (FlashLight*) malloc(sizeof(FlashLight));
   initFlashLight(result, user);
-
   return result;
 }
 
