@@ -3,23 +3,23 @@
 
 
 
-void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint shaderID)
+void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint* shaderID)
 {
 
-  particleGen->shaderID = shaderID;
+  particleGen->shaderID = *shaderID;
   glUseProgram(particleGen->shaderID);
   particleGen->maxNrParticles = maxNrParticles;
   particleGen->particlesCount = 0;
   initParticleVertexBuffer(particleGen->gVertexBuffer);
-  initBillboardVertexBuffer(particleGen->billboardVertexBuffer, particleGen->gVertexBuffer);
-  initParticlePostitionsBuffer(particleGen->particlesPositionBuffer, particleGen->maxNrParticles);
-  initParticleColorBuffer(particleGen->particlesColorBuffer, particleGen->maxNrParticles);
+  initBillboardVertexBuffer(&particleGen->billboardVertexBuffer, particleGen->gVertexBuffer);
+  initParticlePostitionsBuffer(&particleGen->particlesPositionBuffer, particleGen->maxNrParticles);
+  initParticleColorBuffer(&particleGen->particlesColorBuffer, particleGen->maxNrParticles);
 
-  particleGen->particlePositionSizeData = (GLfloat*)malloc(sizeof(GLfloat)* 4 * maxNrParticles); // pos is 3 floats and size is 1 => 4
-  particleGen->particleColorData = (GLubyte*)malloc(sizeof(GLubyte)* 4 * maxNrParticles); // 4 bytes: rgba
-
+  particleGen->particlePositionSizeData = (GLfloat* )malloc(sizeof(GLfloat) * 4 * maxNrParticles); // pos is 3 floats and size is 1 => 4
+  particleGen->particleColorData = (GLfloat* )malloc(sizeof(GLfloat) * 4 * maxNrParticles); // 4 floats: rgba
   // ###!!! SHOULD CALL CONSTRUCTOR FOR EACH PARTICLE IF INIT IS WIERD
   particleGen->particlesContainer = (Particle*)malloc(sizeof(Particle) * maxNrParticles);
+
   vec3 initPos = {0,0,0};
   vec3 initVel = {0,0,0};
   vec4 color = {1,1,1,1};
@@ -27,6 +27,7 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
   {
     particleGen->particlesContainer[i] = *createParticle(initPos, initVel, color, -1, 0);
   }
+
   // First one will be unused.
   particleGen->lastUsedParticleIndex = 0;
 
@@ -36,7 +37,7 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
   printError("Init partgen");
 }
 
-ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint shaderID)
+ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint* shaderID)
 {
   ParticleGenerator* result = (ParticleGenerator*)malloc(sizeof(ParticleGenerator));
   init__ParticleGenerator(result, maxNrParticles, shaderID);
@@ -85,29 +86,29 @@ void initParticleVertexBuffer(GLfloat* vertexbuffer)
 
 
 // ---- Initializers -------------------
-void initBillboardVertexBuffer(GLuint billboardVertexBuffer, GLfloat* vertexbuffer)
+void initBillboardVertexBuffer(GLuint* billboardVertexBuffer, GLfloat* vertexbuffer)
 {
-  glGenBuffers(1, &billboardVertexBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, billboardVertexBuffer);
+  glGenBuffers(1, billboardVertexBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, * billboardVertexBuffer);
   glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), vertexbuffer, GL_STATIC_DRAW);
   printError("Init partgenbillboardbuffer");
 }
 
 // Init position buffer, contains the pos and size of each particle
-void initParticlePostitionsBuffer(GLuint particlesPositionBuffer, int maxNrParticles)
+void initParticlePostitionsBuffer(GLuint* particlesPositionBuffer, int maxNrParticles)
 {
-  glGenBuffers(1, &particlesPositionBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, particlesPositionBuffer);
+  glGenBuffers(1, particlesPositionBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, *particlesPositionBuffer);
   // Initialize sizes with empty (NULL) buffer : it will be updated later, each frame.
   glBufferData(GL_ARRAY_BUFFER, maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 }
 
-void initParticleColorBuffer(GLuint particlesColorBuffer, int maxNrParticles)
+void initParticleColorBuffer(GLuint* particlesColorBuffer, int maxNrParticles)
 {
-  glGenBuffers(1, &particlesColorBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, particlesColorBuffer);
+  glGenBuffers(1, particlesColorBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, *particlesColorBuffer);
   // Initialize colors with empty (NULL) buffer : it will be updated later, each frame.
-  glBufferData(GL_ARRAY_BUFFER, maxNrParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 }
 
 // ---- Updators -----------------------
@@ -121,19 +122,16 @@ void updateParticleSizePositionBuffer(ParticleGenerator* particleGen)
 void updateParticleColorBuffer(ParticleGenerator* particleGen)
 {
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesColorBuffer);
-  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-  glBufferSubData(GL_ARRAY_BUFFER, 0, particleGen->particlesCount * sizeof(GLubyte) * 4, particleGen->particleColorData);
+  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+  glBufferSubData(GL_ARRAY_BUFFER, 0, particleGen->particlesCount * sizeof(GLfloat) * 4, particleGen->particleColorData);
 }
 
 // ---- Binders --------------------------
 void bindBillboardVertexBuffer(ParticleGenerator* particleGen)
 {
-  glUseProgram(particleGen->shaderID);
+  //glUseProgram(particleGen->shaderID);
   glEnableVertexAttribArray(0);
-
-
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->billboardVertexBuffer);
-
   glVertexAttribPointer(
     0, // attribute. No particular reason for 0, but must match the layout in the shader.
     3, // size
@@ -148,7 +146,7 @@ void bindBillboardVertexBuffer(ParticleGenerator* particleGen)
 
 void bindParticlesPostitionBuffer(ParticleGenerator* particleGen)
 {
-  glUseProgram(particleGen->shaderID);
+  //glUseProgram(particleGen->shaderID);
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesPositionBuffer);
   glVertexAttribPointer
@@ -165,15 +163,15 @@ void bindParticlesPostitionBuffer(ParticleGenerator* particleGen)
 
 void bindParticlesColorBuffer(ParticleGenerator* particleGen)
 {
-  glUseProgram(particleGen->shaderID);
+  //glUseProgram(particleGen->shaderID);
   glEnableVertexAttribArray(2);
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesColorBuffer);
   glVertexAttribPointer
   (
     2, // attribute. No particular reason for 1, but must match the layout in the shader.
     4, // size : r + g + b + a => 4
-    GL_UNSIGNED_BYTE, // type
-    GL_TRUE, // normalized? *** YES, this means that the unsigned char[4] will be accessible with a vec4 (floats) in the shader ***
+    GL_FLOAT, // type
+    GL_FALSE,
     0, // stride
     (void*)0 // array buffer offset
   );
@@ -267,7 +265,7 @@ void simulateAllParticles(ParticleGenerator* particleGen)
 
 
     // Decrease life, tweak later
-    p.life = p.life - particleGen->deltaTime;
+    p.life = p.life - particleGen->deltaTime*10;
 
       // Only simulate if alive.
       if (p.life > 0)
@@ -296,42 +294,36 @@ void simulateAllParticles(ParticleGenerator* particleGen)
   			particleGen->particleColorData[4 * particleGen->particlesCount + 2] = p.color.z; //b
   			particleGen->particleColorData[4 * particleGen->particlesCount + 3] = p.color.w; //a
 
-
       }
       else //Else set cameradistance to -1 and the sortingfunction will put dead particles in the end of vector.
       {
         p.life = -1;
         p.cameraDistance = -1; // sort these to end in sortingfunction
-        //printf("Particle died\n");
+        printf("Particle died\n");
       }
 
-      particleGen->particlesCount = particleGen->particlesCount + 1;
+      particleGen->particlesCount++;
     }
   }
   // Sorts particles by cameraDistance for renderorder.
   sortParticlesByCameraDistance(particleGen->particlesContainer);
 
-  //printf("particle count %d\n", particleGen->particlesCount);
+  printf("particle count %d\n", particleGen->particlesCount);
 }
 
-void drawAllParticles(ParticleGenerator* particleGen, mat4 camMatrix, mat4 projectionMatrix)
+void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 projectionMatrix)
 {
+  mat4 WTVMatrix = *camMatrix;
   // Use our shader
 	glUseProgram(particleGen->shaderID);
   // Update buffers for Gpu
-  //updateParticleSizePositionBuffer(particleGen);
-  //updateParticleColorBuffer(particleGen);
-  glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesPositionBuffer);
-  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-  glBufferSubData(GL_ARRAY_BUFFER, 0, particleGen->particlesCount * sizeof(GLfloat) * 4, particleGen->particlePositionSizeData);
+  updateParticleSizePositionBuffer(particleGen);
 
-  glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesColorBuffer);
-  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-  glBufferSubData(GL_ARRAY_BUFFER, 0, particleGen->particlesCount * sizeof(GLubyte) * 4, particleGen->particleColorData);
+  updateParticleColorBuffer(particleGen);
 
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
+  printError("Update error");
 
 /* For textures
 	// Bind our texture in Texture Unit 0
@@ -342,20 +334,23 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4 camMatrix, mat4 proje
 */
 
   // This to face quads to camera
-
+  glUseProgram(particleGen->shaderID);
   // Same as the billboards tutorial
-	//glUniform3f(glGetUniformLocation(particleGen->shaderID, "CamRightWorldSpace"), camMatrix.m[0], camMatrix.m[4], camMatrix.m[8]); // first colonn
-	//glUniform3f(glGetUniformLocation(particleGen->shaderID, "CamUpWorldSpace"), camMatrix.m[1], camMatrix.m[5], camMatrix.m[9]); // second colonn
+	//glUniform3f(glGetUniformLocation(particleGen->shaderID, "CamRightWorldSpace"), WTVMatrix.m[0], WTVMatrix.m[4], WTVMatrix.m[8]); // first colonn
+	//glUniform3f(glGetUniformLocation(particleGen->shaderID, "CamUpWorldSpace"), WTVMatrix.m[1], WTVMatrix.m[5], WTVMatrix.m[9]); // second colonn
 
 
 	glUniformMatrix4fv(glGetUniformLocation(particleGen->shaderID, "ProjectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
-  glUniformMatrix4fv(glGetUniformLocation(particleGen->shaderID, "WTVMatrix"), 1, GL_TRUE, camMatrix.m);
+  glUniformMatrix4fv(glGetUniformLocation(particleGen->shaderID, "WTVMatrix"), 1, GL_TRUE, WTVMatrix.m);
 
+  printError("Uniform ERROR");
   // Bind buffers to shader
-/*
+
   bindBillboardVertexBuffer(particleGen);
   bindParticlesPostitionBuffer(particleGen);
   bindParticlesColorBuffer(particleGen);
+  printError("bind ErROR");
+
 
   // -- Draw
   // This is for draw instanced, first arg is id (see bind functions above)
@@ -363,7 +358,7 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4 camMatrix, mat4 proje
 
   glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
 	glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
-	glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
+	glVertexAttribDivisor(2, 0); // color : one per quad                                  -> 1
 
   // Draw function
   glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleGen->particlesCount);
@@ -371,6 +366,6 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4 camMatrix, mat4 proje
   glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
-*/
+
 
 }
