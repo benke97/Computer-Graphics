@@ -8,13 +8,10 @@
 #include "Terrain.h"
 #include "User.h"
 #include "FlashLight.h"
-<<<<<<< HEAD
-#include "Flarehandler.h"
-=======
 #include "Gun.h"
 #include "Laser.h"
 #include "ParticleGenerator.h"
->>>>>>> e278bdf09528fb96d59393ede492bdfb78a058c0
+#include "Flarehandler.h"
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
@@ -23,12 +20,8 @@ User * user;
 FlashLight* flashlight;
 Gun* gun;
 LightBallHandler* lightballhandler;
-<<<<<<< HEAD
-FlareHandler* flarehandler;
-
-=======
 Laser* laser;
->>>>>>> e278bdf09528fb96d59393ede492bdfb78a058c0
+FlareHandler* flarehandler;
 GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
 
@@ -46,11 +39,8 @@ void init(void)
 
 	user = createUser();
 	lightballhandler = createLightBallHandler();
-<<<<<<< HEAD
 	flarehandler = createFlareHandler();
 
-=======
->>>>>>> e278bdf09528fb96d59393ede492bdfb78a058c0
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);

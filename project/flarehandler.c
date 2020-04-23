@@ -62,8 +62,8 @@ void CheckFlaresCollisions (FlareHandler* flarehandler, Terrain * floor, Terrain
 
     float floorheight = heightFinder(x, z, floor);
     float roofheight = heightFinder(x, z, roof);
-    vec3 floorNormal = getNormal(x, z, floor);
-    vec3 roofNormal = getNormal(x, z, roof);
+    //vec3 floorNormal = getNormal(x, z, floor);
+    //vec3 roofNormal = getNormal(x, z, roof);
 
 //    if(flare->position.y < floorheight || flare->position.y > roofheight - 1){
     if(flare->position.y < floorheight || flare->position.y > roofheight - 5){
