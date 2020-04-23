@@ -120,6 +120,11 @@ void userInput(User * user, Terrain * roof, Terrain * floor)
 	{
 		user->lightball_shooting_activated = true;
 	}
+
+	if (glutKeyIsDown('r'))
+	{
+		user->flareShootingActivated = true;
+	}
 }
 
 bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
@@ -141,7 +146,7 @@ bool validMove(User* user, Terrain* roof, Terrain* floor,int move)
 			}
 			normel = getNormal(tmp.x,tmp.z, floor);
 			slope = DotProduct(normel,upVector);
-			printf("slope %f\n", slope);
+			//printf("slope %f\n", slope);
 			//vec3 tmp2 = VectorSub(user->cam, ScalarMult(a,10));
 			//&& slope(user->cam.x,user->cam.y,tmp2.x,tmp2.y,floor->texwidth, roof) < 2
 			if (heightdiff(tmp.x, tmp.z, roof, floor) > 3.0 && slope > slopethreshold)

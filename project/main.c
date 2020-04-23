@@ -8,6 +8,7 @@
 #include "Terrain.h"
 #include "User.h"
 #include "FlashLight.h"
+#include "Flarehandler.h"
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
@@ -15,6 +16,7 @@ Terrain* roof;
 User * user;
 FlashLight* flashlight;
 LightBallHandler* lightballhandler;
+FlareHandler* flarehandler;
 
 GLfloat specularExponent = 100;
 
@@ -33,6 +35,7 @@ void init(void)
 
 	user = createUser();
 	lightballhandler = createLightBallHandler();
+	flarehandler = createFlareHandler();
 
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
@@ -53,12 +56,21 @@ void display(void)
 	printError("pre display");
 
 	CheckForNewLightBalls(lightballhandler, user, projectionMatrix);
+	CheckForNewFlares(flarehandler, user, projectionMatrix);
+
+	displayFlaresLight (flarehandler, terrain_floor);
 	displayLightBallsLight (lightballhandler, terrain_floor);
 	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
 
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
  	RemoveLightBalls(lightballhandler);
+
+	CheckFlaresCollisions (flarehandler, terrain_floor, roof);
+	MoveAllFlares(flarehandler);
+	RemoveFlares(flarehandler);
+	diaplayFlares (flarehandler, &camMatrix);
+
 
   // FlashLight
   glUseProgram(terrain_floor->shader);
@@ -76,7 +88,7 @@ void display(void)
 	mat4 rot1 = Ry(-angle+ M_PI/2);
 	mat4 rot2 = Rx(-yangle);
 	mat4 rot = Mult(rot1,rot2);
-	printf("angle %f\n", angle);
+	//printf("angle %f\n", angle);
 	glUseProgram(flashlight->shader);
 	mat4 trans = T(flashlight->position.x + flashlight->direction.x/1.5, flashlight->position.y + flashlight->direction.y/1.5, flashlight->position.z + flashlight->direction.z/1.5);
 	mat4 scale = S(0.007,0.007,0.007);
