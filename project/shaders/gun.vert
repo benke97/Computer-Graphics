@@ -1,4 +1,4 @@
-#version 330 core
+#version 150
 
 in vec3 in_Position;
 in vec3 in_Normal;

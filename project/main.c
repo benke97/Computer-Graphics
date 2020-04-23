@@ -8,18 +8,29 @@
 #include "Terrain.h"
 #include "User.h"
 #include "FlashLight.h"
+<<<<<<< HEAD
 #include "Flarehandler.h"
+=======
+#include "Gun.h"
+#include "Laser.h"
+#include "ParticleGenerator.h"
+>>>>>>> e278bdf09528fb96d59393ede492bdfb78a058c0
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
 Terrain* roof;
 User * user;
 FlashLight* flashlight;
+Gun* gun;
 LightBallHandler* lightballhandler;
+<<<<<<< HEAD
 FlareHandler* flarehandler;
 
+=======
+Laser* laser;
+>>>>>>> e278bdf09528fb96d59393ede492bdfb78a058c0
 GLfloat specularExponent = 100;
-
+ParticleGenerator* FLParticleGen;
 
 void init(void)
 {
@@ -35,14 +46,26 @@ void init(void)
 
 	user = createUser();
 	lightballhandler = createLightBallHandler();
+<<<<<<< HEAD
 	flarehandler = createFlareHandler();
 
+=======
+>>>>>>> e278bdf09528fb96d59393ede492bdfb78a058c0
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
+	gun = createGun(user);
+	laser = createLaser(gun);
   LoadTGATextureSimple("textures/stoneee.tga", &terrain_floor->terrain_texture);
 	LoadTGATextureSimple("textures/stoneee.tga", &roof->terrain_texture);
 	LoadTGATextureSimple("textures/fonarik_low_Albedo.tga", &flashlight->texture);
+	LoadTGATextureSimple("textures/Laser_Rifle_Diffuse.tga", &gun->texture);
+	// Particle Generator
+	// init shaders
+	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
+	glUseProgram(PGshaderID);
+	FLParticleGen = createParticleGenerator(100000, &PGshaderID);
+
 }
 
 void display(void)
@@ -62,6 +85,7 @@ void display(void)
 	displayLightBallsLight (lightballhandler, terrain_floor);
 	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
 
+//LightBalls
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix);
  	RemoveLightBalls(lightballhandler);
@@ -77,6 +101,8 @@ void display(void)
 
   FlashLight__updateDirection(flashlight, user);
 	FlashLight__updatePosition(flashlight, user);
+	Gun__updateDirection(gun, user);
+	Gun__updatePosition(gun, user);
 
   glUniform3f(glGetUniformLocation(terrain_floor->shader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
   glUniform3f(glGetUniformLocation(terrain_floor->shader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
@@ -96,9 +122,44 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, flashlight->texture);
 	drawFlashlight(flashlight, projectionMatrix);
 	displayFlashlight(flashlight, &camMatrix,tot,rot);
+
+
+	glUseProgram(gun->shader);
+	trans = T(gun->position.x + gun->direction.x/1.5, gun->position.y + gun->direction.y/1.5, gun->position.z + gun->direction.z/1.5);
+	scale = S(0.015,0.015,0.015);
+	tot = Mult(trans,scale);
+	rot1 = Ry(-angle+M_PI/2);
+	rot2 = Rx(-yangle);
+	rot = Mult(rot1,rot2);
+	glBindTexture(GL_TEXTURE_2D, gun->texture);
+	drawGun(gun, projectionMatrix);
+	displayGun(gun, &camMatrix,tot,rot);
 	//printf("innercutoff %f\n", flashlight->cutOffAngle);
   //printf("outercutoff %f\n", flashlight->outerCutOff);
+	scale = S(1,1,1);
+	//trans = T(laser->position.x, laser->position.y, laser->position.z);
+	trans = T(gun->position.x + gun->direction.x, gun->position.y + gun->direction.y, gun->position.z + gun->direction.z);
+	rot = Rz(M_PI/2);
+	tot = Mult(trans,scale);
+	displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
 	printError("display 2");
+	glutSwapBuffers();
+	// Particles, generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLife)
+
+	glUseProgram(FLParticleGen->shaderID);
+
+	vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.05);
+
+	vec4 initColor = {1,0,0,1};
+	mat4 TRANs = T(flashlight->position.x + flashlight->direction.x/1, flashlight->position.y + flashlight->direction.y/1, flashlight->position.z + flashlight->direction.z/1);
+	mat4 SCALe = S(1,1,1);
+	mat4 TOTe = Mult(TRANs, SCALe);
+	glUniformMatrix4fv(glGetUniformLocation(FLParticleGen->shaderID, "Trans"), 1, GL_TRUE, TOTe.m);
+
+	generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 1.5f, 50.0f, 100.0f);
+	simulateAllParticles(FLParticleGen);
+	//drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
+
 	glutSwapBuffers();
 }
 
