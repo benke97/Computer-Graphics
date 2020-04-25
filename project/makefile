@@ -10,8 +10,8 @@ main : main.c terrain.c user.c lightball.c flashlight.c lightballhandler.c parti
 	gcc -Wall -o main -I$(commondir) -I../common/Linux -DGL_GLEXT_PROTOTYPES main.c terrain.c user.c lightball.c  flashlight.c lightballhandler.c particles.c gun.c laser.c particlegenerator.c flarehandler.c flare.c $(commondir)GL_utilities.c $(commondir)loadobj.c $(commondir)VectorUtils3.c $(commondir)LoadTGA.c $(commondir)Linux/MicroGlut.c -lXt -lX11 -lGL -lm -g
 
 
-mac : main.c terrain.c user.c lightball.c flashlight.c lightballhandler.c particles.c particlegenerator.c flarehandler.c flare.c $(commondir)GL_utilities.c $(commondir)VectorUtils3.c $(commondir)loadobj.c $(commondir)LoadTGA.c $(commondir)Mac/MicroGlut.m
-	gcc -Wall -o mac -I$(commondir) -I../common/Mac -DGL_GLEXT_PROTOTYPES main.c terrain.c user.c lightball.c flashlight.c lightballhandler.c particles.c particlegenerator.c flarehandler.c flare.c $(commondir)GL_utilities.c $(commondir)loadobj.c $(commondir)VectorUtils3.c $(commondir)LoadTGA.c $(commondir)Mac/MicroGlut.m -framework OpenGL -framework Cocoa -lm -g -Wno-deprecated-declarations
+mac : main.c terrain.c user.c lightball.c flashlight.c lightballhandler.c particles.c particlegenerator.c flarehandler.c flare.c gun.c laser.c  $(commondir)GL_utilities.c $(commondir)VectorUtils3.c $(commondir)loadobj.c $(commondir)LoadTGA.c $(commondir)Mac/MicroGlut.m
+	gcc -Wall -o mac -I$(commondir) -I../common/Mac -DGL_GLEXT_PROTOTYPES main.c terrain.c user.c lightball.c flashlight.c lightballhandler.c particles.c particlegenerator.c flarehandler.c flare.c gun.c laser.c $(commondir)GL_utilities.c $(commondir)loadobj.c $(commondir)VectorUtils3.c $(commondir)LoadTGA.c $(commondir)Mac/MicroGlut.m -framework OpenGL -framework Cocoa -lm -g -Wno-deprecated-declarations
 
 clean :
 	rm  testmall main mac

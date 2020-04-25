@@ -54,7 +54,7 @@ void init(void)
 	// init shaders
 	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
 	glUseProgram(PGshaderID);
-	FLParticleGen = createParticleGenerator(100000, &PGshaderID);
+	FLParticleGen = createParticleGenerator(250000, &PGshaderID);
 
 }
 
@@ -77,7 +77,7 @@ void display(void)
 
 //LightBalls
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
- 	MoveAllLightBalls(lightballhandler, &camMatrix);
+ 	MoveAllLightBalls(lightballhandler, &camMatrix, FLParticleGen);
  	RemoveLightBalls(lightballhandler);
 
 	CheckFlaresCollisions (flarehandler, terrain_floor, roof);
@@ -134,21 +134,14 @@ void display(void)
 	displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
 	printError("display 2");
 	glutSwapBuffers();
-	// Particles, generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLife)
 
+	// Particles, generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
 	glUseProgram(FLParticleGen->shaderID);
-
-	vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.05);
-
-	vec4 initColor = {1,0,0,1};
-	mat4 TRANs = T(flashlight->position.x + flashlight->direction.x/1, flashlight->position.y + flashlight->direction.y/1, flashlight->position.z + flashlight->direction.z/1);
-	mat4 SCALe = S(1,1,1);
-	mat4 TOTe = Mult(TRANs, SCALe);
-	glUniformMatrix4fv(glGetUniformLocation(FLParticleGen->shaderID, "Trans"), 1, GL_TRUE, TOTe.m);
-
-	generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 1.5f, 50.0f, 100.0f);
-	simulateAllParticles(FLParticleGen);
-	//drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
+	//vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.05);
+	//vec4 initColor = {1,0,0,0.5};
+	//generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 1.5f, 0.05f, 2.0f);
+	simulateAllParticles(FLParticleGen, user);
+	drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
 
 	glutSwapBuffers();
 }

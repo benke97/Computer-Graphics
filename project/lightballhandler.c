@@ -80,7 +80,7 @@ void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * flo
   }
 }
 
-void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix){
+void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix, ParticleGenerator* particleGen){
   for (int ball=0; ball < lightballhandler->LightBallsQuantity; ball++){
     LightBall * lightball = &lightballhandler->lightballs[ball];
 
@@ -97,6 +97,11 @@ void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix){
     rot1 = Rx(0);
     displayLightBall(lightball, camMatrix, trans, rot1);
 
+    //PARTICLES
+    vec3 initSpeed = ScalarMult(Normalize(lightball->direction), 1);
+  	vec4 initColor = {1,0,0,0.5};
+    vec3 initPosition = {lightball->position.x, lightball->position.y + 1, lightball->position.z};
+    generateParticles(particleGen, 500, initSpeed, initPosition, initColor, 0.05f, 0.1f, 2.0f);
   }
 }
 

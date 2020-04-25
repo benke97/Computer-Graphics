@@ -6,7 +6,9 @@ void init__Particle(Particle* particle, vec3 position, vec3 velocity, vec4 color
 {
   particle->position = position;
   particle->velocity = velocity;
-  particle->color = color;
+  vec4 white = {1,1,1,0};
+  particle->color = white;
+  particle->targetColor = color;
   particle->life = life;
   particle->constLife = life;
   particle->size = size;

@@ -7,6 +7,7 @@
 #include "Terrain.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "ParticleGenerator.h"
 
 
 
@@ -25,7 +26,7 @@ void initLightBallHandler(LightBallHandler*);
 LightBallHandler* createLightBallHandler();
 void RemoveLightBalls(LightBallHandler*);
 void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * floor, Terrain * roof);
-void MoveAllLightBalls(LightBallHandler*, mat4*);
+void MoveAllLightBalls(LightBallHandler*, mat4*, ParticleGenerator*);
 void CheckForNewLightBalls (LightBallHandler*, User *, mat4);
 void displayLightBallsLight (LightBallHandler* lightballhandler, Terrain * terrain);
 

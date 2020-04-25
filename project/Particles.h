@@ -9,6 +9,7 @@ typedef struct
   vec3 position;
   vec3 velocity;
   vec4 color;
+  vec4 targetColor;
   GLfloat life;
   GLfloat cameraDistance;
   // Doesn't change, use for reset.
