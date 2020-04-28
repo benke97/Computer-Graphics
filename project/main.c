@@ -143,9 +143,9 @@ void display(void)
 
 	// Particles, generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
 	glUseProgram(FLParticleGen->shaderID);
-	//vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.05);
+	//vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.0005);
 	//vec4 initColor = {1,0,0,0.5};
-	//generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 1.5f, 0.05f, 2.0f);
+	//generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 0.1f, 0.3f, 1.0f);
 	simulateAllParticles(FLParticleGen, user);
 	drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
 
@@ -169,6 +169,7 @@ int main(int argc, char **argv)
 	glutCreateWindow ("Laser DOOM");
 	glutDisplayFunc(display);
 	init ();
+	glutHideCursor();
 	glutTimerFunc(20, &timer, 0);
 	glutPassiveMotionFunc(mouse);
 	glutMainLoop();

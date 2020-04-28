@@ -31,6 +31,8 @@ typedef struct
 
   GLuint shaderID;
 
+  GLuint particleTexture;
+
 } ParticleGenerator;
 
 // Init shaders before and pass shaderID
