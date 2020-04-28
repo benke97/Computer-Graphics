@@ -23,6 +23,12 @@ uniform vec3 flashlightDirection;
 uniform float flashlightCutOff;
 uniform float flashlightOuterCutOff;
 
+//For laser:
+uniform int LaserQuantity;
+uniform vec3 laserPositions[100];
+uniform vec3 laserColors[100];
+uniform float laserIntensities[100];
+
 //For Flares:
 uniform int FlaresQuantity;
 uniform vec3 FlaresPositions[100];
@@ -110,6 +116,20 @@ void main(void)
 			totcolor += color;
 		}
 		*/
+
+	}
+
+	//Laser
+	for (int i = 0; i < LaserQuantity; i++)
+	{
+		dist = distance(laserPositions[i], outPosition) * 4;
+		light = normalize(laserPositions[i] - outPosition)/dist;
+		//shade = abs(dot(normalize(fragnormal), light));
+		shade = dot(normalize(fragnormal), light);
+
+		shade = clamp(shade, 0, 1);
+		color = shade*laserColors[i];
+		totcolor += color;
 
 	}
 	// ---------------------------------

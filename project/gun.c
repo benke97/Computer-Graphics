@@ -36,6 +36,7 @@ void drawGun(Gun* gun, mat4 projectionMatrix){
 
 void displayGun(Gun* gun, mat4 * wtvMatrixp, mat4 trans, mat4 rot1) {
   glUseProgram(gun->shader);
+  glBindTexture(GL_TEXTURE_2D, gun->texture);
   mat4 wtvMatrix = *wtvMatrixp;
   glUniformMatrix4fv(glGetUniformLocation(gun->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;

@@ -12,6 +12,7 @@
 #include "Laser.h"
 #include "ParticleGenerator.h"
 #include "Flarehandler.h"
+#include "Laserhandler.h"
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
@@ -20,7 +21,7 @@ User * user;
 FlashLight* flashlight;
 Gun* gun;
 LightBallHandler* lightballhandler;
-Laser* laser;
+LaserHandler* laserhandler;
 FlareHandler* flarehandler;
 GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
@@ -40,12 +41,11 @@ void init(void)
 	user = createUser();
 	lightballhandler = createLightBallHandler();
 	flarehandler = createFlareHandler();
-
+	laserhandler = createLaserHandler();
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
 	gun = createGun(user);
-	laser = createLaser(gun);
   LoadTGATextureSimple("textures/stoneee.tga", &terrain_floor->terrain_texture);
 	LoadTGATextureSimple("textures/stoneee.tga", &roof->terrain_texture);
 	LoadTGATextureSimple("textures/fonarik_low_Albedo.tga", &flashlight->texture);
@@ -54,7 +54,7 @@ void init(void)
 	// init shaders
 	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
 	glUseProgram(PGshaderID);
-	FLParticleGen = createParticleGenerator(250000, &PGshaderID);
+	FLParticleGen = createParticleGenerator(100000, &PGshaderID);
 
 }
 
@@ -71,6 +71,7 @@ void display(void)
 	CheckForNewLightBalls(lightballhandler, user, projectionMatrix);
 	CheckForNewFlares(flarehandler, user, projectionMatrix);
 
+
 	displayFlaresLight (flarehandler, terrain_floor);
 	displayLightBallsLight (lightballhandler, terrain_floor);
 	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
@@ -86,6 +87,11 @@ void display(void)
 	diaplayFlares (flarehandler, &camMatrix);
 
 
+	CheckForNewLasers(laserhandler,user,gun,projectionMatrix);
+	displayLaserLight (laserhandler, terrain_floor);
+	CheckLaserCollisions(laserhandler, terrain_floor, roof);
+	MoveAllLasers(laserhandler,&camMatrix, projectionMatrix);
+	RemoveLasers(laserhandler);
   // FlashLight
   glUseProgram(terrain_floor->shader);
 
@@ -126,12 +132,12 @@ void display(void)
 	displayGun(gun, &camMatrix,tot,rot);
 	//printf("innercutoff %f\n", flashlight->cutOffAngle);
   //printf("outercutoff %f\n", flashlight->outerCutOff);
-	scale = S(1,1,1);
+	//scale = S(1,1,1);
 	//trans = T(laser->position.x, laser->position.y, laser->position.z);
-	trans = T(gun->position.x + gun->direction.x, gun->position.y + gun->direction.y, gun->position.z + gun->direction.z);
-	rot = Rz(M_PI/2);
-	tot = Mult(trans,scale);
-	displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
+	//trans = T(gun->position.x + gun->direction.x, gun->position.y + gun->direction.y, gun->position.z + gun->direction.z);
+	//rot = Rz(M_PI/2);
+	//tot = Mult(trans,scale);
+	//displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
 	printError("display 2");
 	glutSwapBuffers();
 
