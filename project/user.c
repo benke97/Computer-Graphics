@@ -29,6 +29,8 @@ void initUser (User * user) {
   user->side_movement = SetVector (0,0,0);
 	user->lightball_shooting_activated = false;
 	user->laser_shooting_activated = false;
+	user->enemyShootingActivated = false;
+	user->flareShootingActivated = false;
 	user->speed = 1;
 }
 
@@ -126,6 +128,12 @@ void userInput(User * user, Terrain * roof, Terrain * floor)
 	if (glutKeyIsDown('r'))
 	{
 		user->flareShootingActivated = true;
+
+	}
+
+	if (glutKeyIsDown('q'))
+	{
+		user->enemyShootingActivated = true;
 
 	}
 

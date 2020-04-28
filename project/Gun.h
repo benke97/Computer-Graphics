@@ -18,7 +18,7 @@ Gun * createGun(User* user);
 void Gun__updateDirection(Gun* gun, User* user);
 void Gun__updatePosition(Gun* gun, User* user);
 void drawGun(Gun* gun, mat4 projectionMatrix);
-void displayGun(Gun* gun, mat4 * wtvMatrixp, mat4 trans, mat4 rot1);
+void displayGun(Gun* gun, mat4 * wtvMatrixp, float trans, float rot1);
 
 
 
