@@ -1,5 +1,5 @@
-#ifndef _FLARE_H_
-#define _FLARE_H_
+#ifndef _ENEMY_H_
+#define _ENEMY_H_
 
 #include "VectorUtils3.h"
 
@@ -16,6 +16,7 @@ typedef struct Enemy {
   bool flying;
   float intensity;
   float lifeTimer;
+  GLuint texture;
 } Enemy;
 
 

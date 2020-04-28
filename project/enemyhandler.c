@@ -21,13 +21,30 @@ EnemyHandler* createEnemyHandler() {
 };
 
 
-void CheckForNewEnemies (EnemyHandler* enemyhandler, User * user, mat4 projectionMatrix){
+void CheckForNewEnemies (EnemyHandler* enemyhandler, User * user, Terrain * floor, mat4 projectionMatrix){
   if (user->enemyShootingActivated && enemyhandler->timeUntilNextEnemy < 0) {
     Enemy * enemy;
 
     enemy = createEnemy(projectionMatrix);
     enemyhandler->enemiesColor[enemyhandler->EnemiesQuantity] = SetVector(1.0f, 1.0f, 0.0f);
-    enemy->position = user->cam;
+
+    bool goodPositionFound = false;
+    while (!goodPositionFound) {
+      float x = rand() % 200 + 25;
+      float z = rand() % 200 + 25;
+      float y = heightFinder(x, z, floor);
+      if(y < 10) {
+        goodPositionFound = true;
+        enemy->position = SetVector(x, y, z);
+        printf("user: x: %f , y: %f , z: %f", user->cam.x, user->cam.y, user->cam.z);
+        printf("enemy: x: %f , y: %f , z: %f", enemy->position.x, enemy->position.y, enemy->position.z);
+      }
+    }
+
+
+
+
+
     enemyhandler->enemiesPositions[enemyhandler->EnemiesQuantity] = enemy->position;
     enemyhandler->enemiesIntensities[enemyhandler->EnemiesQuantity] = enemy->intensity;
     enemy->direction = Normalize(VectorSub(user->lookAtPoint, user->cam));
@@ -69,7 +86,7 @@ void CheckEnemiesCollisions (EnemyHandler* enemyhandler, Terrain * floor, Terrai
     if(enemy->position.y < floorheight || enemy->position.y > roofheight - 5){
 
       //enemy->flying = false;
-      enemy->intensity -= 0.05;
+      //enemy->intensity -= 0.05;
       /*
       if(enemy->position.y < floorheight ) {
         enemyhandler->enemiesPositions[enemy_ind] = VectorSub(enemy->position, ScalarMult(floorNormal, -1));
@@ -102,9 +119,9 @@ void RemoveEnemies(EnemyHandler* enemyhandler){
   for (int ball=0; ball < enemyhandler->EnemiesQuantity; ball++){
   Enemy * enemy = &enemyhandler->enemies[ball];
     //if (Norm(enemy->position) > enemyhandler->maxDistance) {
-    if (enemy->intensity < 0.01) {
+    /*if (enemy->intensity < 0.01) {
       enemy->active = false;
-    }
+    }*/
   }
 
   Enemy new_enemies[100];
@@ -136,7 +153,7 @@ void RemoveEnemies(EnemyHandler* enemyhandler){
 void displayEnemiesLight (EnemyHandler* enemyhandler, Terrain * terrain) {
   glUseProgram(terrain->shader);
   //printf("x-pos: %f", enemyhandler->enemiesPositions[0].x);
-  printf("x-int: %f \n", enemyhandler->enemiesIntensities[0]);
+  //printf("x-int: %f \n", enemyhandler->enemiesIntensities[0]);
   //printf("x-col: %f", enemyhandler->enemiesColor[0].x);
   glUniform1i(glGetUniformLocation(terrain->shader, "EnemiesQuantity"), enemyhandler->EnemiesQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "EnemiesPositions"), enemyhandler->EnemiesQuantity, &enemyhandler->enemiesPositions[0].x);

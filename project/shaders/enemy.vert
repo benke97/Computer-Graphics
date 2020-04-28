@@ -16,10 +16,7 @@ void main(void)
 {
 	//mat3 rotation = mat3(mdlMatrix);
 	fragNormal = in_Normal;
-	vec4 scale = vec4(1.0, 1.0, 1.0, 1.0);
-	scale.x *= intensity;
-	scale.y *= intensity;
-	scale.z *= intensity;
-	gl_Position = projectionMatrix*wtvMatrix*mdlMatrix*vec4(in_Position, 2/(1*intensity));
+
+	gl_Position = projectionMatrix*wtvMatrix*mdlMatrix*vec4(in_Position, 50);
 	outTexCoord = inTexCoord;
 }

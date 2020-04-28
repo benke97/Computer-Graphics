@@ -35,6 +35,8 @@ uniform vec3 FlaresPositions[100];
 uniform vec3 FlaresColor[100];
 uniform float FlaresIntensities[100];
 
+
+
 void main(void)
 {
 	vec3 ambient = vec3(0.1,0.1,0.1);
@@ -146,6 +148,10 @@ void main(void)
 		totcolor += color;
 		//totcolor = vec3(1.0, 1.0, 1.0);
 	}
+
+	// ---------------------------------
+
+
 
 	totcolor = clamp(totcolor, 0, 1);
 	vec4 textemp = texture(terrain_texture, texCoord);

@@ -20,7 +20,7 @@ FlashLight * createFlashLight(User* user);
 void FlashLight__updateDirection(FlashLight* flashlight, User* user);
 void FlashLight__updatePosition(FlashLight* flashlight, User* user);
 void drawFlashlight(FlashLight* flashlight, mat4 projectionMatrix);
-void displayFlashlight(FlashLight* flashlight, mat4 * wtvMatrixp, mat4 trans, mat4 rot1);
+void displayFlashlight(FlashLight* flashlight, mat4 * wtvMatrixp, float trans, float rot1);
 
 
 

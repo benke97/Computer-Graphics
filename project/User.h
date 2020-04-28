@@ -11,6 +11,7 @@ typedef struct User {
   bool lightball_shooting_activated;
   bool laser_shooting_activated;
   bool flareShootingActivated;
+  bool enemyShootingActivated;
   int speed;
 } User;
 

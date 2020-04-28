@@ -1,5 +1,5 @@
-#ifndef _FLAREHANDLER_H_
-#define _FLAREHANDLER_H_
+#ifndef _ENEMYHANDLER_H_
+#define _ENEMYHANDLER_H_
 
 #include "VectorUtils3.h"
 #include "Enemy.h"
@@ -15,6 +15,7 @@ typedef struct EnemyHandler {
   vec3 enemiesPositions[100];
   float enemiesIntensities[100];
   Enemy enemies[100];
+
   int EnemiesQuantity;
   int timeUntilNextEnemy;
   int maxDistance;
@@ -24,11 +25,11 @@ typedef struct EnemyHandler {
 void initEnemyHandler(EnemyHandler*);
 EnemyHandler* createEnemyHandler();
 void diaplayEnemies (EnemyHandler*, mat4 *camMatrix);
-void CheckForNewEnemies (EnemyHandler*, User *, mat4);
+void CheckForNewEnemies (EnemyHandler*, User *,Terrain *, mat4);
 void MoveAllEnemies(EnemyHandler*);
 void RemoveEnemies(EnemyHandler*);
 void CheckEnemiesCollisions (EnemyHandler*, Terrain *, Terrain *);
 
-void displayEnemiesLight (EnemyHandler* lightballhandler, Terrain * terrain);
+void displayEnemiesLight (EnemyHandler*, Terrain * terrain);
 
 #endif
