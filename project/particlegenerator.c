@@ -274,9 +274,9 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
 
     // Set speed to random plus the initial speed if moving object.
     vec3 speedDir;
-    speedDir.x = rand() % 100;
-    speedDir.y = rand() % 100;
-    speedDir.z = rand() % 100;
+    speedDir.x = (rand() % 100) - 50;
+    speedDir.y = (rand() % 100) - 50;
+    speedDir.z = (rand() % 100) - 50;
     Normalize(speedDir);
     particleGen->particlesContainer[particleIndex].velocity = VectorAdd(initialSpeed, ScalarMult(speedDir, particleSpread));
 
@@ -372,7 +372,7 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user)
       }
     }
   }
-  printf("particle count %d\n", particleGen->particlesCount);
+  //printf("particle count %d\n", particleGen->particlesCount);
 
   // Sorts particles by cameraDistance for renderorder.
   sortParticlesByCameraDistance(particleGen->particlesContainer, particleGen->maxNrParticles);

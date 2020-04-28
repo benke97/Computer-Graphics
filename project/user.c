@@ -38,7 +38,7 @@ void mouse(int x, int y)
 	//printf("%d %d\n", x, y);
 	float diffx = x - (glutGet(GLUT_WINDOW_WIDTH)/2);
 	float diffy = y - (glutGet(GLUT_WINDOW_HEIGHT)/2);
-	yangle += -diffy/700;
+	yangle += -diffy/4000;
 
 	if (yangle < -M_PI/3)
 	{
@@ -48,7 +48,7 @@ void mouse(int x, int y)
 	{
 			yangle = M_PI/3;
 	}
-	angle += diffx/700;
+	angle += diffx/4000;
 }
 
 
@@ -129,7 +129,7 @@ void userInput(User * user, Terrain * roof, Terrain * floor)
 
 	}
 
-	if( glutKeyIsDown(GLUT_LEFT_BUTTON))
+	if( glutMouseIsDown(GLUT_MIDDLE_BUTTON))
 	{
 		user->laser_shooting_activated = true;
 	}

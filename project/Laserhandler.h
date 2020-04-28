@@ -26,7 +26,7 @@ void initLaserHandler(LaserHandler*);
 LaserHandler* createLaserHandler();
 void RemoveLasers(LaserHandler*);
 void CheckLaserCollisions (LaserHandler* laserhandler, Terrain * floor, Terrain * roof);
-void MoveAllLasers(LaserHandler*, mat4*);
+void MoveAllLasers(LaserHandler*, mat4*,mat4);
 void CheckForNewLasers (LaserHandler* laserhandler, User * user, Gun * gun, mat4 projectionMatrix);
 void displayLaserLight (LaserHandler* laserhandler, Terrain * terrain);
 

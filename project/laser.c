@@ -8,8 +8,14 @@ void initLaser(Laser* laser, Gun* gun) {
   Laser__setStartPosition(laser, gun);
   laser->shader = loadShaders("shaders/laser.vert", "shaders/laser.frag");
   laser->model = LoadModelPlus("models/lasershot.obj");
-  laser->speed = 5.0;
+  laser->speed = 4;
   laser->flying = true;
+  laser->active = true;
+  mat4 rot, rot1, rot2;
+  rot1 = Ry(-angle+M_PI/2);
+  rot2 = Rx(-yangle+M_PI/2);
+  rot = Mult(rot1,rot2);
+  laser->orientation = rot;
 }
 
 Laser * createLaser(Gun* gun){
@@ -25,7 +31,7 @@ void Laser__setDirection(Laser* laser, Gun* gun)
 
 void Laser__setStartPosition(Laser* laser, Gun* gun)
 {
-  laser->position = VectorAdd(gun->position, gun->direction);
+  laser->position = VectorSub(gun->position,gun->direction);
 }
 
 void Laser__updatePosition(Laser* laser)

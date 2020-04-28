@@ -12,7 +12,9 @@ typedef struct Laser
   Model *model;
   GLuint shader;
   float speed;
+  mat4 orientation;
   bool flying;
+  bool active;
 } Laser;
 
 void initLaser(Laser* laser, Gun* gun);
