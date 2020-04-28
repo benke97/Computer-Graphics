@@ -1,0 +1,22 @@
+#version 150
+
+in vec4 vertcolor;
+in vec2 outTexCoord;
+in vec3 fragNormal;
+
+out vec4 out_Color;
+
+uniform float t;
+uniform sampler2D texUnit;
+uniform float intensity;
+
+void main(void)
+{
+	//const vec3 light = vec3(0.58, 0.58, 0.58);
+	//float shade;
+	//shade = dot(normalize(fragNormal), light);
+	//shade = clamp(shade, 0, 1);
+	//float time = sin(t/1000);
+	//out_Color = shade*texture(texUnit, outTexCoord * 10);
+  out_Color = intensity*vec4(1.0);
+}
