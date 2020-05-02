@@ -1,4 +1,3 @@
-
 #include "Laserhandler.h"
 
 #include "VectorUtils3.h"
@@ -29,7 +28,7 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
     laserhandler->laserPositions[laserhandler->LaserQuantity] = laser->position;
     laserhandler->lasers[laserhandler->LaserQuantity] = *laser;
     laserhandler->LaserQuantity += 1;
-    laserhandler->timeUntilNextLaser = 10;
+    laserhandler->timeUntilNextLaser = 2;
   }
 	else {
 		laserhandler->timeUntilNextLaser--;
@@ -39,24 +38,24 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
 
 void CheckLaserCollisions (LaserHandler* laserhandler, Terrain * floor, Terrain * roof) {
   for (int lasercount=0; lasercount < laserhandler->LaserQuantity; lasercount++){
-    Laser * laser = &laserhandler->lightballs[lasercount];
+    Laser * laser = &laserhandler->lasers[lasercount];
 
     float x = laser->position.x;
     float z = laser->position.z;
 
-    float floorheight = heightFinder(x, z, floor->texwidth, floor);
-    float roofheight = heightFinder(x, z, roof->texwidth, roof);
-    vec3 floorNormal = getNormal(x, z, floor->texwidth, floor);
-    vec3 roofNormal = getNormal(x, z, roof->texwidth, roof);
+    float floorheight = heightFinder(x, z, floor);
+    float roofheight = heightFinder(x, z, roof);
+    vec3 floorNormal = getNormal(x, z, floor);
+    vec3 roofNormal = getNormal(x, z, roof);
 
     if(laser->position.y < floorheight || laser->position.y > roofheight - 5){
 
       laser->flying = false;
-      //lightball->lifeTimer--;
+      laser->active = false;
 
 
 
-      if(lightball->position.y < floorheight ) {
+      if(laser->position.y < floorheight ) {
       laserhandler->laserPositions[lasercount] = VectorSub(laser->position, ScalarMult(floorNormal, -1));
       }
       else {
@@ -68,7 +67,7 @@ void CheckLaserCollisions (LaserHandler* laserhandler, Terrain * floor, Terrain 
   }
 }
 
-void MoveAllLasers(LaserHandler* laserhandler, mat4 *camMatrix){
+void MoveAllLasers(LaserHandler* laserhandler, mat4 *camMatrix, mat4 projectionMatrix){
   for (int lasercount=0; lasercount < laserhandler->LaserQuantity; lasercount++){
     Laser * laser = &laserhandler->lasers[lasercount];
 
@@ -76,48 +75,40 @@ void MoveAllLasers(LaserHandler* laserhandler, mat4 *camMatrix){
       Laser__updatePosition(laser);
       laserhandler->laserPositions[lasercount] = laser->position;
     }
-
-    mat4 trans, rot1;
+    glUseProgram(laser->shader);
+    mat4 trans, scale, tot;
     trans = T(laser->position.x, laser->position.y, laser->position.z);
-    rot1 = Rz(M_PI/2);
-    displayLightBall(lightball, camMatrix, trans, rot1);
+    scale = S(0.7,0.7,0.7);
+    tot = Mult(trans,scale);
+    displayLaser(laser, camMatrix, tot, laser->orientation, projectionMatrix);
 
   }
 }
 
 void RemoveLasers(LaserHandler* laserhandler){
-
-  for (int lasercount=0; lasercount < laserhandler->LaserQuantity; lasercount++){
-  Laser * laser = &laserhandler->lasers[lasercount];
-    //if (Norm(lightball->position) > laserhandler->maxDistance) {
-    if (lightball->lifeTimer < -50) {
-      lightball->active = false;
-    }
-  }
-
-  LightBall new_lightballs[100];
+  Laser new_lasers[100];
 	vec3 new_laserPositions[100];
   float new_laserIntensities[100];
 	vec3 new_laserColors[100];
-	int new_ball = 0;
+	int new_laser = 0;
 
-  for (int ball=0; ball < laserhandler->LaserQuantity; ball++){
-    if (laserhandler->lightballs[ball].active) {
-        new_lightballs[new_ball] = laserhandler->lightballs[ball];
-        new_laserPositions[new_ball] = laserhandler->laserPositions[ball];
-        new_laserIntensities[new_ball] = laserhandler->laserIntensities[ball];
-				new_laserColors[new_ball] = laserhandler->laserColors[ball];
-				new_ball++;
+  for (int lasercount=0; lasercount < laserhandler->LaserQuantity; lasercount++){
+    if (laserhandler->lasers[lasercount].active) {
+        new_lasers[new_laser] = laserhandler->lasers[lasercount];
+        new_laserPositions[new_laser] = laserhandler->laserPositions[lasercount];
+        new_laserIntensities[new_laser] = laserhandler->laserIntensities[lasercount];
+				new_laserColors[new_laser] = laserhandler->laserColors[lasercount];
+				new_laser++;
     }
   }
 
-	laserhandler->LaserQuantity = new_ball;
+	laserhandler->LaserQuantity = new_laser;
 
-	for (int ball=0; ball < laserhandler->LaserQuantity; ball++) {
-		laserhandler->lightballs[ball] = new_lightballs[ball];
-		laserhandler->laserPositions[ball] = new_laserPositions[ball];
-    laserhandler->laserIntensities[ball] = new_laserIntensities[ball];
-    laserhandler->laserColors[ball] = new_laserColors[ball];
+	for (int lasercount=0; lasercount < laserhandler->LaserQuantity; lasercount++) {
+		laserhandler->lasers[lasercount] = new_lasers[lasercount];
+		laserhandler->laserPositions[lasercount] = new_laserPositions[lasercount];
+    laserhandler->laserIntensities[lasercount] = new_laserIntensities[lasercount];
+    laserhandler->laserColors[lasercount] = new_laserColors[lasercount];
 	}
 }
 

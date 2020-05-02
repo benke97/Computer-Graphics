@@ -23,11 +23,19 @@ uniform vec3 flashlightDirection;
 uniform float flashlightCutOff;
 uniform float flashlightOuterCutOff;
 
+//For laser:
+uniform int LaserQuantity;
+uniform vec3 laserPositions[100];
+uniform vec3 laserColors[100];
+uniform float laserIntensities[100];
+
 //For Flares:
 uniform int FlaresQuantity;
 uniform vec3 FlaresPositions[100];
 uniform vec3 FlaresColor[100];
 uniform float FlaresIntensities[100];
+
+
 
 void main(void)
 {
@@ -112,6 +120,20 @@ void main(void)
 		*/
 
 	}
+
+	//Laser
+	for (int i = 0; i < LaserQuantity; i++)
+	{
+		dist = distance(laserPositions[i], outPosition) * 4;
+		light = normalize(laserPositions[i] - outPosition)/dist;
+		//shade = abs(dot(normalize(fragnormal), light));
+		shade = dot(normalize(fragnormal), light);
+
+		shade = clamp(shade, 0, 1);
+		color = shade*laserColors[i];
+		totcolor += color;
+
+	}
 	// ---------------------------------
 	for (int i = 0; i < FlaresQuantity; i++)
 	{
@@ -126,6 +148,10 @@ void main(void)
 		totcolor += color;
 		//totcolor = vec3(1.0, 1.0, 1.0);
 	}
+
+	// ---------------------------------
+
+
 
 	totcolor = clamp(totcolor, 0, 1);
 	vec4 textemp = texture(terrain_texture, texCoord);

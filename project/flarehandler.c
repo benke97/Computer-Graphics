@@ -136,7 +136,7 @@ void RemoveFlares(FlareHandler* flarehandler){
 void displayFlaresLight (FlareHandler* flarehandler, Terrain * terrain) {
   glUseProgram(terrain->shader);
   //printf("x-pos: %f", flarehandler->flaresPositions[0].x);
-  printf("x-int: %f \n", flarehandler->flaresIntensities[0]);
+  //printf("x-int: %f \n", flarehandler->flaresIntensities[0]);
   //printf("x-col: %f", flarehandler->flaresColor[0].x);
   glUniform1i(glGetUniformLocation(terrain->shader, "FlaresQuantity"), flarehandler->FlaresQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "FlaresPositions"), flarehandler->FlaresQuantity, &flarehandler->flaresPositions[0].x);

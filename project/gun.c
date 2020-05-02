@@ -1,4 +1,7 @@
 #include "Gun.h"
+#include "VectorUtils3.h"
+#include "loadobj.h"
+#include "LoadTGA.h"
 #include "GL_utilities.h"
 #include <math.h>
 
@@ -7,6 +10,9 @@ void initGun(Gun* gun, User* user) {
   Gun__updateDirection(gun, user);
   gun->shader = loadShaders("shaders/gun.vert", "shaders/gun.frag");
   gun->model = LoadModelPlus("models/XCom.obj");
+  //glBindTexture(GL_TEXTURE_2D, gun->texture);
+  LoadTGATextureSimple("textures/Laser_Rifle_Diffuse.tga", &gun->texture);
+  //LoadTGATextureSimple("textures/conc.tga", &gun->texture);
 }
 
 Gun * createGun(User* user){
@@ -34,12 +40,21 @@ void drawGun(Gun* gun, mat4 projectionMatrix){
 	glEnableVertexAttribArray(glGetAttribLocation(gun->shader, "projectionMatrix"));
 };
 
-void displayGun(Gun* gun, mat4 * wtvMatrixp, mat4 trans, mat4 rot1) {
+void displayGun(Gun* gun, mat4 * wtvMatrixp, float angle, float yangle) {
   glUseProgram(gun->shader);
+
+  mat4 trans = T(gun->position.x + gun->direction.x/1.5, gun->position.y + gun->direction.y/1.5, gun->position.z + gun->direction.z/1.5);
+  mat4 scale = S(0.015,0.015,0.015);
+  mat4 tot = Mult(trans,scale);
+  mat4 rot1 = Ry(-angle+M_PI/2);
+  mat4 rot2 = Rx(-yangle);
+  mat4 rot = Mult(rot1,rot2);
+
+  glBindTexture(GL_TEXTURE_2D, gun->texture);
   mat4 wtvMatrix = *wtvMatrixp;
   glUniformMatrix4fv(glGetUniformLocation(gun->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;
-  total = Mult(trans, rot1);
+  total = Mult(tot, rot);
   glUniformMatrix4fv(glGetUniformLocation(gun->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
   DrawModel(gun->model, gun->shader, "in_Position", "in_Normal", "inTexCoord");
 };

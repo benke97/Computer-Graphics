@@ -17,5 +17,5 @@ void main(void)
 	//shade = clamp(shade, 0, 1);
 	//float time = sin(t/1000);
 	//out_Color = shade*texture(texUnit, outTexCoord * 10);
-  out_Color = vec4(1.0);
+  out_Color = vec4(1.0,0,0,0);
 }

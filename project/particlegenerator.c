@@ -34,6 +34,9 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
   particleGen->lastTimeDrawCall = 0;
 
   particleGen->deltaTime = 0;
+
+  LoadTGATextureSimple("textures/ParticleTexture2.tga", &particleGen->particleTexture);
+
   printError("Init partgen");
 }
 
@@ -274,9 +277,9 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
 
     // Set speed to random plus the initial speed if moving object.
     vec3 speedDir;
-    speedDir.x = rand() % 100;
-    speedDir.y = rand() % 100;
-    speedDir.z = rand() % 100;
+    speedDir.x = (rand() % 100) - 50;
+    speedDir.y = (rand() % 100) - 50;
+    speedDir.z = (rand() % 100) - 50;
     Normalize(speedDir);
     particleGen->particlesContainer[particleIndex].velocity = VectorAdd(initialSpeed, ScalarMult(speedDir, particleSpread));
 
@@ -372,7 +375,7 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user)
       }
     }
   }
-  printf("particle count %d\n", particleGen->particlesCount);
+  //printf("particle count %d\n", particleGen->particlesCount);
 
   // Sorts particles by cameraDistance for renderorder.
   sortParticlesByCameraDistance(particleGen->particlesContainer, particleGen->maxNrParticles);
@@ -404,15 +407,14 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 proj
 
 
   printError("Update error");
-
-/* For textures
+  /*
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture);
+	glBindTexture(GL_TEXTURE_2D, particleGen->particleTexture);
 	// Set our "myTextureSampler" sampler to use Texture Unit 0
-	glUniform1i(TextureID, 0);
-*/
+	glUniform1i(glGetUniformLocation(particleGen->shaderID, "particleTex"), 0);
 
+*/
   // This to face quads to camera
   glUseProgram(particleGen->shaderID);
   // Same as the billboards tutorial

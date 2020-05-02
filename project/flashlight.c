@@ -9,6 +9,8 @@ void initFlashLight (FlashLight * FlashLight, User* user) {
   FlashLight->outerCutOff = cos(M_PI/9);
   FlashLight->shader = loadShaders("shaders/flashlight.vert", "shaders/flashlight.frag");
   FlashLight->model = LoadModelPlus("models/flashlight.obj");
+  LoadTGATextureSimple("textures/fonarik_low_Albedo.tga", &FlashLight->texture);
+
 }
 
 FlashLight * createFlashLight(User* user){
@@ -36,12 +38,23 @@ void drawFlashlight(FlashLight* flashlight, mat4 projectionMatrix){
 	glEnableVertexAttribArray(glGetAttribLocation(flashlight->shader, "projectionMatrix"));
 };
 
-void displayFlashlight(FlashLight* flashlight, mat4 * wtvMatrixp, mat4 trans, mat4 rot1) {
+void displayFlashlight(FlashLight* flashlight, mat4 * wtvMatrixp, float angle, float yangle) {
   glUseProgram(flashlight->shader);
+
+  	mat4 rot1 = Ry(-angle+ M_PI/2);
+  	mat4 rot2 = Rx(-yangle);
+  	mat4 rot = Mult(rot1,rot2);
+  	//printf("angle %f\n", angle);
+  	mat4 trans = T(flashlight->position.x + flashlight->direction.x/1.5, flashlight->position.y + flashlight->direction.y/1.5, flashlight->position.z + flashlight->direction.z/1.5);
+  	mat4 scale = S(0.007,0.007,0.007);
+  	mat4 tot = Mult(trans,scale);
+  	glBindTexture(GL_TEXTURE_2D, flashlight->texture);
+
+
   mat4 wtvMatrix = *wtvMatrixp;
   glUniformMatrix4fv(glGetUniformLocation(flashlight->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;
-  total = Mult(trans, rot1);
+  total = Mult(tot, rot);
   glUniformMatrix4fv(glGetUniformLocation(flashlight->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
   DrawModel(flashlight->model, flashlight->shader, "in_Position", "in_Normal", "inTexCoord");
 };
