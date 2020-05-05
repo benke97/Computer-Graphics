@@ -297,7 +297,7 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
 }
 
 
-void simulateAllParticles(ParticleGenerator* particleGen, User* user)
+void simulateAllParticles(ParticleGenerator* particleGen, User* user, int gravityOn)
 {
   particleGen->particlesCount = 0;
   for (int i = 0; i < particleGen->maxNrParticles; i++)
@@ -323,9 +323,14 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user)
         // Simple break sim.
         vec3 retardation = {-p->velocity.x * 1.4, -p->velocity.y * 1.4, -p->velocity.z * 1.4};
         p->velocity = VectorAdd(p->velocity, ScalarMult(retardation, (float)(particleGen->deltaTime * 0.001f * 0.2)));
-        // Simple gravity sim.
-        vec3 gravity = {0.0f,-9.81f, 0.0f};
-        p->velocity = VectorAdd(p->velocity, ScalarMult(gravity, (float)(particleGen->deltaTime * 0.001f * 0.2f))); // Last digit is weight in kilos
+
+        if (gravityOn != 0)
+        {
+          // Simple gravity sim.
+          vec3 gravity = {0.0f,-9.81f, 0.0f};
+          p->velocity = VectorAdd(p->velocity, ScalarMult(gravity, (float)(particleGen->deltaTime * 0.001f * 0.2f))); // Last digit is weight in kilos
+        }
+        
   			p->position = VectorAdd(p->position, ScalarMult(p->velocity, (float)(particleGen->deltaTime * 0.001f)));
 
         // Calculate distance to camera
@@ -407,14 +412,14 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 proj
 
 
   printError("Update error");
-  /*
+/*
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, particleGen->particleTexture);
 	// Set our "myTextureSampler" sampler to use Texture Unit 0
 	glUniform1i(glGetUniformLocation(particleGen->shaderID, "particleTex"), 0);
-
 */
+
   // This to face quads to camera
   glUseProgram(particleGen->shaderID);
   // Same as the billboards tutorial

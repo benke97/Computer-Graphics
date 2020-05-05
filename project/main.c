@@ -29,6 +29,7 @@ EnemyHandler* enemyhandler;
 GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
 ParticleGenerator* FlareParticleGen;
+ParticleGenerator* GunParticleGen;
 
 void init(void)
 {
@@ -64,6 +65,10 @@ void init(void)
 	// Particle generator flare
 	glUseProgram(PGshaderID);
 	FlareParticleGen = createParticleGenerator(100000, &PGshaderID);
+
+	// Particle generator flare
+	glUseProgram(PGshaderID);
+	GunParticleGen = createParticleGenerator(100000, &PGshaderID);
 
 }
 
@@ -109,7 +114,7 @@ void display(void)
 
 
 
-	CheckForNewLasers(laserhandler,user,gun,projectionMatrix);
+	CheckForNewLasers(laserhandler,user,gun,projectionMatrix, GunParticleGen);
 	displayLaserLight (laserhandler, terrain_floor);
 	CheckLaserCollisions(laserhandler, terrain_floor, roof);
 	MoveAllLasers(laserhandler,&camMatrix, projectionMatrix);
@@ -165,12 +170,16 @@ void display(void)
 	//vec4 initColor = {1,0,0,0.5};
 	//generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 0.1f, 0.3f, 1.0f);
 	// Lightball particles
-	simulateAllParticles(FLParticleGen, user);
+	simulateAllParticles(FLParticleGen, user, 1);
 	drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
 
 	// Flare particles
-	simulateAllParticles(FlareParticleGen, user);
+	simulateAllParticles(FlareParticleGen, user, 1);
 	drawAllParticles(FlareParticleGen, &camMatrix, projectionMatrix);
+
+	// gun particles
+	simulateAllParticles(GunParticleGen, user, 0);
+	drawAllParticles(GunParticleGen, &camMatrix, projectionMatrix);
 
 	glutSwapBuffers();
 }
