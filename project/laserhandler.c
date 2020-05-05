@@ -20,24 +20,6 @@ LaserHandler* createLaserHandler() {
 };
 
 
-<<<<<<< HEAD
-void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 projectionMatrix, ParticleGenerator* particleGen){
-  if (user->laser_shooting_activated && laserhandler->timeUntilNextLaser < 0) {
-    Laser * laser;
-    laser = createLaser(gun);
-    laserhandler->laserColors[laserhandler->LaserQuantity] = SetVector(1.0f, 0.0f, 0.0f);
-    laserhandler->laserPositions[laserhandler->LaserQuantity] = laser->position;
-    laserhandler->lasers[laserhandler->LaserQuantity] = *laser;
-    laserhandler->LaserQuantity += 1;
-    laserhandler->timeUntilNextLaser = 2;
-
-    // Create paricles on gun pos
-    vec3 initSpeed = ScalarMult(Normalize(gun->direction), 2);
-  	vec4 targetColor = {1,0,0,0.5};
-    vec3 initPosition = {gun->position.x + initSpeed.x - 0.1, gun->position.y + initSpeed.y - 0.1, gun->position.z + initSpeed.z - 0.1};
-    generateParticles(particleGen, 100, initSpeed, initPosition, 0.1f, targetColor, 0.01f, 0.15f, 1.0f);
-
-=======
 void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 projectionMatrix, ParticleGenerator* particleGen){
   if (user->laser_shooting_activated && laserhandler->timeUntilNextLaser < 0 && !gun->overheated) {
     if (gun->heat > 200)
@@ -62,7 +44,6 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
       vec3 initPosition = {gun->position.x + initSpeed.x - 0.1, gun->position.y + initSpeed.y - 0.1, gun->position.z + initSpeed.z - 0.1};
       generateParticles(particleGen, 100, initSpeed, initPosition, 0.1f, targetColor, 0.01f, 0.15f, 1.0f);
     }
->>>>>>> b27c2a30d35c9defa9e4aa50885faf0216d8b377
   }
 	else {
 		laserhandler->timeUntilNextLaser--;
