@@ -228,7 +228,7 @@ int findUnusedParticleIndex(ParticleGenerator* particleGen)
 	return 0; // All particles are taken, override the first one
 }
 
-void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
+void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, GLfloat radius, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
 {
   // Delta in ms
   GLfloat currentTime = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
@@ -267,7 +267,7 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
     // Set position to provided(i.e if spawned on moving object).
     //particleGen->particlesContainer[particleIndex].position = initialPostition;
     // Spawn on a sphere around init position with radius radius.
-    GLfloat radius = 1.1f;
+    //GLfloat radius = 1.1f;
     GLfloat theta = (rand() % 180) * (M_PI / 180);
     GLfloat phi = (rand() % 360) * (M_PI / 180);
 

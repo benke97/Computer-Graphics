@@ -101,7 +101,7 @@ void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix, Part
     vec3 initSpeed = ScalarMult(Normalize(lightball->direction), 1);
   	vec4 initColor = {1,0,0,0.5};
     vec3 initPosition = {lightball->position.x, lightball->position.y + 1, lightball->position.z};
-    generateParticles(particleGen, 1000, initSpeed, initPosition, initColor, 0.05f, 0.3f, 1.0f);
+    generateParticles(particleGen, 1000, initSpeed, initPosition, 1.1f, initColor, 0.05f, 0.3f, 1.0f);
   }
 }
 
