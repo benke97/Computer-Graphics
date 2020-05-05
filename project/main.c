@@ -149,7 +149,6 @@ void display(void)
 	//tot = Mult(trans,scale);
 	//displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
 	printError("display 2");
-	glutSwapBuffers();
 
 	// Particles, generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
 	glUseProgram(FLParticleGen->shaderID);
