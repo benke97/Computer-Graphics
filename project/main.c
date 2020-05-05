@@ -110,8 +110,6 @@ void display(void)
 	MoveAllLasers(laserhandler,&camMatrix, projectionMatrix);
 	RemoveLasers(laserhandler);
 
-
-
   // FlashLight
 
 
@@ -133,6 +131,9 @@ void display(void)
   glUniform3f(glGetUniformLocation(terrain_floor->shader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
   glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightCutOff"), flashlight->cutOffAngle);
 	glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
+
+	glUseProgram(gun->shader);
+	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
 
 
 

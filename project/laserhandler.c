@@ -21,19 +21,40 @@ LaserHandler* createLaserHandler() {
 
 
 void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 projectionMatrix){
-  if (user->laser_shooting_activated && laserhandler->timeUntilNextLaser < 0) {
-    Laser * laser;
-    laser = createLaser(gun);
-    laserhandler->laserColors[laserhandler->LaserQuantity] = SetVector(1.0f, 0.0f, 0.0f);
-    laserhandler->laserPositions[laserhandler->LaserQuantity] = laser->position;
-    laserhandler->lasers[laserhandler->LaserQuantity] = *laser;
-    laserhandler->LaserQuantity += 1;
-    laserhandler->timeUntilNextLaser = 2;
+  if (user->laser_shooting_activated && laserhandler->timeUntilNextLaser < 0 && !gun->overheated) {
+    if (gun->heat > 200)
+    {
+      gun->overheated = true;
+    }
+    else
+    {
+      Laser * laser;
+      laser = createLaser(gun);
+      laserhandler->laserColors[laserhandler->LaserQuantity] = SetVector(1.0f, 0.0f, 0.0f);
+      laserhandler->laserPositions[laserhandler->LaserQuantity] = laser->position;
+      laserhandler->lasers[laserhandler->LaserQuantity] = *laser;
+      laserhandler->LaserQuantity += 1;
+      laserhandler->timeUntilNextLaser = 2;
+      gun->heat += 10;
+      printf("%f heat\n",gun->heat);
+    }
   }
 	else {
 		laserhandler->timeUntilNextLaser--;
 		user->laser_shooting_activated = false;
 	}
+  if (gun->heat > 0)
+  {
+    gun->heat -= 1;
+  }
+  if (gun->heat < 0)
+  {
+    gun->heat = 0;
+  }
+  if (gun->heat == 0 && gun->overheated)
+  {
+    gun->overheated = false;
+  }
 }
 
 void CheckLaserCollisions (LaserHandler* laserhandler, Terrain * floor, Terrain * roof) {
