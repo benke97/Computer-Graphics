@@ -14,6 +14,7 @@
 #include "Flarehandler.h"
 #include "Laserhandler.h"
 #include "Enemyhandler.h"
+#include "Collisionhandler.h"
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
@@ -29,6 +30,7 @@ EnemyHandler* enemyhandler;
 GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
 ParticleGenerator* FlareParticleGen;
+CollisionHandler* collisionhandler;
 ParticleGenerator* GunParticleGen;
 
 void init(void)
@@ -48,6 +50,7 @@ void init(void)
 	flarehandler = createFlareHandler();
 	laserhandler = createLaserHandler();
 	enemyhandler = createEnemyHandler();
+	collisionhandler = createCollisionHandler();
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
@@ -142,6 +145,7 @@ void display(void)
   glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightCutOff"), flashlight->cutOffAngle);
 	glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 
+	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler);
 	glUseProgram(gun->shader);
 	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
 

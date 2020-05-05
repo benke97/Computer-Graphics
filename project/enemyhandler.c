@@ -119,9 +119,9 @@ void RemoveEnemies(EnemyHandler* enemyhandler){
   for (int ball=0; ball < enemyhandler->EnemiesQuantity; ball++){
   Enemy * enemy = &enemyhandler->enemies[ball];
     //if (Norm(enemy->position) > enemyhandler->maxDistance) {
-    /*if (enemy->intensity < 0.01) {
+    if (enemy->lifeTimer < 0) {
       enemy->active = false;
-    }*/
+    }
   }
 
   Enemy new_enemies[100];

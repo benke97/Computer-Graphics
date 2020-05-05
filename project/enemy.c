@@ -15,7 +15,7 @@ void initEnemy(Enemy* this, mat4 projectionMatrix) {
   this->flying = true;
   this->model = LoadModelPlus("models/FatTerrorist.obj");
   this->intensity = 1.0;
-  this->lifeTimer = 0;
+  this->lifeTimer = 20;
   LoadTGATextureSimple("textures/FatTerrorist.tga", &this->texture);
   //LoadTGATextureSimple("textures/conc.tga", &this->texture);
 
