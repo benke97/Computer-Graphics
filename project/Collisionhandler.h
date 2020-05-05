@@ -2,34 +2,24 @@
 #define _COLLISIONHANDLER_H_
 
 #include "VectorUtils3.h"
-#include "Enemy.h"
-#include "User.h"
-#include "Terrain.h"
+#include "Enemyhandler.h"
+#include "Laserhandler.h"
+#include "Lightballhandler.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
 
 
 
-typedef struct EnemyHandler {
-  vec3 enemiesColor[100];
-  vec3 enemiesPositions[100];
-  float enemiesIntensities[100];
-  Enemy enemies[100];
+typedef struct CollisionHandler {
+  vec3 * enemiesPositions[100];
+  vec3 * lightballsPositions[100];
+  vec3 * laserPositions[100];
 
-  int EnemiesQuantity;
-  int timeUntilNextEnemy;
-  int maxDistance;
-} EnemyHandler;
+} CollisionHandler;
 
 
-void initEnemyHandler(EnemyHandler*);
-EnemyHandler* createEnemyHandler();
-void diaplayEnemies (EnemyHandler*, mat4 *camMatrix);
-void CheckForNewEnemies (EnemyHandler*, User *,Terrain *, mat4);
-void MoveAllEnemies(EnemyHandler*);
-void RemoveEnemies(EnemyHandler*);
-void CheckEnemiesCollisions (EnemyHandler*, Terrain *, Terrain *);
-
-void displayEnemiesLight (EnemyHandler*, Terrain * terrain);
+void initCollisionHandler(CollisionHandler*);
+CollisionHandler* createCollisionHandler();
+void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* enemyhandler, LaserHandler* laserhandler); 
 
 #endif
