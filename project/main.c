@@ -21,6 +21,7 @@ Terrain* roof;
 User * user;
 FlashLight* flashlight;
 Gun* gun;
+Gun* gun2;
 LightBallHandler* lightballhandler;
 LaserHandler* laserhandler;
 FlareHandler* flarehandler;
@@ -50,6 +51,7 @@ void init(void)
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
 	gun = createGun(user);
+	gun2 = createGun(user);
   LoadTGATextureSimple("textures/stoneee.tga", &terrain_floor->terrain_texture);
 	LoadTGATextureSimple("textures/stoneee.tga", &roof->terrain_texture);
 
@@ -122,7 +124,9 @@ void display(void)
 	displayGun(gun, &camMatrix, angle, yangle);
 	drawFlashlight(flashlight, projectionMatrix);
 	displayFlashlight(flashlight, &camMatrix,angle,yangle);
-
+	//dummy object for solving textureproblem
+	drawGun(gun2, projectionMatrix);
+	displayGun(gun2, &camMatrix, angle, yangle);
 
   FlashLight__updateDirection(flashlight, user);
 	FlashLight__updatePosition(flashlight, user);
