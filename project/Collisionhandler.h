@@ -1,5 +1,5 @@
-#ifndef _ENEMYHANDLER_H_
-#define _ENEMYHANDLER_H_
+#ifndef _COLLISIONHANDLER_H_
+#define _COLLISIONHANDLER_H_
 
 #include "VectorUtils3.h"
 #include "Enemy.h"
