@@ -10,6 +10,8 @@ void initGun(Gun* gun, User* user) {
   Gun__updateDirection(gun, user);
   gun->shader = loadShaders("shaders/gun.vert", "shaders/gun.frag");
   gun->model = LoadModelPlus("models/XCom.obj");
+  gun->overheated = false;
+  gun->heat = 0.0;
   //glBindTexture(GL_TEXTURE_2D, gun->texture);
   LoadTGATextureSimple("textures/Laser_Rifle_Diffuse.tga", &gun->texture);
   //LoadTGATextureSimple("textures/conc.tga", &gun->texture);

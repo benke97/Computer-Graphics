@@ -11,6 +11,8 @@ typedef struct Gun
   Model *model;
   GLuint shader;
   GLuint texture;
+  bool overheated;
+  float heat;
 } Gun;
 
 void initGun(Gun* gun, User* user);
