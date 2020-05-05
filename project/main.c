@@ -27,6 +27,7 @@ FlareHandler* flarehandler;
 EnemyHandler* enemyhandler;
 GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
+ParticleGenerator* FlareParticleGen;
 
 void init(void)
 {
@@ -52,11 +53,15 @@ void init(void)
   LoadTGATextureSimple("textures/stoneee.tga", &terrain_floor->terrain_texture);
 	LoadTGATextureSimple("textures/stoneee.tga", &roof->terrain_texture);
 
-	// Particle Generator
+	// Particle Generator lightball
 	// init shaders
 	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
 	glUseProgram(PGshaderID);
 	FLParticleGen = createParticleGenerator(100000, &PGshaderID);
+
+	// Particle generator flare
+	glUseProgram(PGshaderID);
+	FlareParticleGen = createParticleGenerator(100000, &PGshaderID);
 
 }
 
@@ -87,7 +92,7 @@ void display(void)
  	RemoveLightBalls(lightballhandler);
 
 	CheckFlaresCollisions (flarehandler, terrain_floor, roof);
-	MoveAllFlares(flarehandler);
+	MoveAllFlares(flarehandler, FlareParticleGen);
 	RemoveFlares(flarehandler);
 	diaplayFlares (flarehandler, &camMatrix);
 
@@ -155,8 +160,13 @@ void display(void)
 	//vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.0005);
 	//vec4 initColor = {1,0,0,0.5};
 	//generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 0.1f, 0.3f, 1.0f);
+	// Lightball particles
 	simulateAllParticles(FLParticleGen, user);
 	drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
+
+	// Flare particles
+	simulateAllParticles(FlareParticleGen, user);
+	drawAllParticles(FlareParticleGen, &camMatrix, projectionMatrix);
 
 	glutSwapBuffers();
 }
