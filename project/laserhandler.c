@@ -61,6 +61,15 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
   {
     gun->overheated = false;
   }
+
+  if (gun->overheated)
+  {
+    vec3 initSpeed = ScalarMult(Normalize(gun->direction), 2);
+    vec4 targetColor = {0.5,0.5,0.5,0.5};
+    vec3 initPosition = {gun->position.x + initSpeed.x*0.5, gun->position.y + initSpeed.y*0.5, gun->position.z + initSpeed.z*0.5};
+    initSpeed = SetVector(0,1,0);
+    generateParticles(particleGen, 80, initSpeed, initPosition, 0.18f, targetColor, 0.001f, 0.2f, 1.0f);
+  }
 }
 
 void CheckLaserCollisions (LaserHandler* laserhandler, Terrain * floor, Terrain * roof) {

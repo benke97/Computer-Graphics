@@ -330,7 +330,7 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user, int gravit
           vec3 gravity = {0.0f,-9.81f, 0.0f};
           p->velocity = VectorAdd(p->velocity, ScalarMult(gravity, (float)(particleGen->deltaTime * 0.001f * 0.2f))); // Last digit is weight in kilos
         }
-        
+
   			p->position = VectorAdd(p->position, ScalarMult(p->velocity, (float)(particleGen->deltaTime * 0.001f)));
 
         // Calculate distance to camera
@@ -412,13 +412,13 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 proj
 
 
   printError("Update error");
-/*
+
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, particleGen->particleTexture);
 	// Set our "myTextureSampler" sampler to use Texture Unit 0
 	glUniform1i(glGetUniformLocation(particleGen->shaderID, "particleTex"), 0);
-*/
+
 
   // This to face quads to camera
   glUseProgram(particleGen->shaderID);
