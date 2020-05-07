@@ -43,9 +43,8 @@ void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* ene
         if (enemyhandler->enemies[enemy].lifeTimer <= 0) {
           lightball->active = false;
         }
-        else {
-          enemyhandler->enemies[enemy].lifeTimer=lightball->lifeTimer + 50;
-        }
+        enemyhandler->enemies[enemy].lifeTimer -= 1;
+
 
 
       }

@@ -54,7 +54,7 @@ void displayEnemy(Enemy* enemy, mat4 * wtvMatrixp, mat4 trans, mat4 rot1) {
   mat4 total;
   total = Mult(trans, rot1);
   glUniformMatrix4fv(glGetUniformLocation(enemy->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-  glUniform1f(glGetUniformLocation(enemy->shader, "intensity"), enemy->intensity);
+  glUniform1f(glGetUniformLocation(enemy->shader, "LifeTimer"), enemy->lifeTimer);
   DrawModel(enemy->model, enemy->shader, "in_Position", "in_Normal", "inTexCoord");
 };
 
@@ -63,6 +63,6 @@ void MoveEnemy(Enemy* enemy) {
     //enemy->position.x = enemy->position.x + enemy->direction.x / 4;
     //enemy->position.z = enemy->position.z + enemy->direction.z / 4;
     //enemy->position.y = 7.0 + 30*enemy->direction.y * enemy->lifeTimer - 9.82 * pow(enemy->lifeTimer, 2) / 2;
-    enemy->lifeTimer += 0.015;
-    enemy->intensity -= 0.005;
+    //enemy->lifeTimer += 0.015;
+    //enemy->intensity -= 0.005;
 }
