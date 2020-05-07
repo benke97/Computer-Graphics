@@ -111,7 +111,7 @@ void display(void)
 
 
 	CheckEnemiesCollisions (enemyhandler, terrain_floor, roof);
-	MoveAllEnemies(enemyhandler);
+	MoveAllEnemies(enemyhandler, user, terrain_floor);
 	RemoveEnemies(enemyhandler);
 	diaplayEnemies (enemyhandler, &camMatrix, user);
 
@@ -150,7 +150,7 @@ void display(void)
 	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
 
 
-	
+
 
 
 

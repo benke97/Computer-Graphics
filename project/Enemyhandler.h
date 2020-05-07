@@ -26,7 +26,7 @@ void initEnemyHandler(EnemyHandler*);
 EnemyHandler* createEnemyHandler();
 void diaplayEnemies (EnemyHandler*, mat4 *camMatrix, User *);
 void CheckForNewEnemies (EnemyHandler*, User *,Terrain *, mat4);
-void MoveAllEnemies(EnemyHandler*);
+void MoveAllEnemies(EnemyHandler*, User *, Terrain * );
 void RemoveEnemies(EnemyHandler*);
 void CheckEnemiesCollisions (EnemyHandler*, Terrain *, Terrain *);
 void displayEnemiesLight (EnemyHandler*, Terrain * terrain);

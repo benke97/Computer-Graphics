@@ -60,8 +60,8 @@ void CheckForNewEnemies (EnemyHandler* enemyhandler, User * user, Terrain * floo
   }
 	else {
 		enemyhandler->timeUntilNextEnemy--;
-		user->enemyShootingActivated = false;
 	}
+	user->enemyShootingActivated = false;
 }
 
 void diaplayEnemies (EnemyHandler* enemyhandler, mat4 *camMatrix, User * user) {
@@ -89,16 +89,16 @@ void CheckEnemiesCollisions (EnemyHandler* enemyhandler, Terrain * floor, Terrai
   }
 }
 
-void MoveAllEnemies(EnemyHandler* enemyhandler){
-  for (int ball=0; ball < enemyhandler->EnemiesQuantity; ball++){
-    Enemy * enemy = &enemyhandler->enemies[ball];
+void MoveAllEnemies(EnemyHandler* enemyhandler, User * user, Terrain * floor){
+  for (int e=0; e < enemyhandler->EnemiesQuantity; e++){
+    Enemy * enemy = &enemyhandler->enemies[e];
 
     if (enemy->flying) {
-      MoveEnemy(enemy);
-      enemyhandler->enemiesPositions[ball] = enemy->position;
+      MoveEnemy(enemy, user->cam, floor);
+      enemyhandler->enemiesPositions[e] = enemy->position;
     }
 
-    enemyhandler->enemiesIntensities[ball] = enemy->intensity*30;
+    //enemyhandler->enemiesIntensities[e] = enemy->intensity*30;
   }
 }
 

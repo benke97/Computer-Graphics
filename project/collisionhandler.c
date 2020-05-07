@@ -39,7 +39,8 @@ void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* ene
         }
 
         lightball->lifeTimer--;
-
+        lightball->intensity = 0.1;
+        lightball->position = VectorAdd(enemyhandler->enemies[enemy].position, SetVector(0,1.5,0));
         if (enemyhandler->enemies[enemy].lifeTimer <= 0) {
           lightball->active = false;
         }

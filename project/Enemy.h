@@ -2,7 +2,7 @@
 #define _ENEMY_H_
 
 #include "VectorUtils3.h"
-
+#include "Terrain.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
 //typedef struct {} Terrain;
@@ -24,6 +24,6 @@ void initEnemy(Enemy* this, mat4 projectionMatrix);
 Enemy* createEnemy (mat4 projectionMatrix);
 void drawEnemy(Enemy* enemy, mat4 projectionMatrix);
 void displayEnemy(Enemy* enemy, mat4 * wtvMatrixp, mat4 trans, mat4 rot1);
-void MoveEnemy(Enemy* enemy);
+void MoveEnemy(Enemy* enemy, vec3 userPos, Terrain *);
 
 #endif
