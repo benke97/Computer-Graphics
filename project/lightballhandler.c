@@ -88,6 +88,9 @@ void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix, Part
       MoveLightBall(lightball);
       lightballhandler->lightBallsPositions[ball] = lightball->position;
     }
+    else {
+      lightball->lifeTimer--;
+    }
 
 
     lightballhandler->lightBallsIntensities[ball] = lightball->intensity;

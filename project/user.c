@@ -32,6 +32,7 @@ void initUser (User * user) {
 	user->enemyShootingActivated = false;
 	user->flareShootingActivated = false;
 	user->speed = 1;
+	user->gameover = false;
 }
 
 

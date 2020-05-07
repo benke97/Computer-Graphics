@@ -145,12 +145,15 @@ void display(void)
   glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightCutOff"), flashlight->cutOffAngle);
 	glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 
-	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler);
+	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler, user);
 	glUseProgram(gun->shader);
 	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
 
 
-
+	if (user->gameover) {
+		user->cam = SetVector(25,200,-100);
+		
+	}
 
 
 

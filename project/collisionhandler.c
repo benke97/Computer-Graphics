@@ -18,8 +18,9 @@ CollisionHandler* createCollisionHandler() {
   return result;
 };
 
-void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* enemyhandler, LaserHandler* laserhandler) {
+void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* enemyhandler, LaserHandler* laserhandler, User* user) {
   for (int enemy=0; enemy < enemyhandler->EnemiesQuantity; enemy++){
+    bool gotHitByLightBall = false;
     for (int shot=0; shot < laserhandler->LaserQuantity; shot++) {
       if (Norm(VectorSub(VectorAdd(enemyhandler->enemiesPositions[enemy], SetVector(0,1.5,0)), laserhandler->laserPositions[shot])) < 3){
         laserhandler->lasers[shot].active=false;
@@ -38,17 +39,22 @@ void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* ene
           lightball->intensity = 1;
         }
 
-        lightball->lifeTimer--;
-        lightball->intensity = 0.1;
+
         lightball->position = VectorAdd(enemyhandler->enemies[enemy].position, SetVector(0,1.5,0));
-        if (enemyhandler->enemies[enemy].lifeTimer <= 0) {
+        if (enemyhandler->enemies[enemy].lifeTimer <= 0 || !enemyhandler->enemies[enemy].active) {
           lightball->active = false;
         }
-        enemyhandler->enemies[enemy].lifeTimer -= 1;
-
-
-
+      gotHitByLightBall = true;
       }
+    }
+
+
+    if (Norm(VectorSub(VectorAdd(enemyhandler->enemiesPositions[enemy], SetVector(0,1.5,0)), user->cam)) < 1.5){
+      user->gameover = true;
+    }
+
+    if (gotHitByLightBall) {
+      enemyhandler->enemies[enemy].lifeTimer -= 1;
     }
 
 

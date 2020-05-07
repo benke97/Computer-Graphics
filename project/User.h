@@ -13,6 +13,7 @@ typedef struct User {
   bool flareShootingActivated;
   bool enemyShootingActivated;
   int speed;
+  bool gameover;
 } User;
 
 void mouse(int x, int y);
