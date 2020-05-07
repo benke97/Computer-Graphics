@@ -25,7 +25,7 @@ typedef struct EnemyHandler {
 void initEnemyHandler(EnemyHandler*);
 EnemyHandler* createEnemyHandler();
 void diaplayEnemies (EnemyHandler*, mat4 *camMatrix, User *);
-void CheckForNewEnemies (EnemyHandler*, User *,Terrain *, mat4);
+void CheckForNewEnemies (EnemyHandler*, User *,Terrain *, mat4, GLuint enemyShader);
 void MoveAllEnemies(EnemyHandler*, User *, Terrain * );
 void RemoveEnemies(EnemyHandler*);
 void CheckEnemiesCollisions (EnemyHandler*, Terrain *, Terrain *);

@@ -20,8 +20,8 @@ typedef struct Enemy {
 } Enemy;
 
 
-void initEnemy(Enemy* this, mat4 projectionMatrix);
-Enemy* createEnemy (mat4 projectionMatrix);
+void initEnemy(Enemy* this, mat4 projectionMatrix, GLuint enemyShader);
+Enemy* createEnemy (mat4 projectionMatrix, GLuint enemyShader);
 void drawEnemy(Enemy* enemy, mat4 projectionMatrix);
 void displayEnemy(Enemy* enemy, mat4 * wtvMatrixp, mat4 trans, mat4 rot1);
 void MoveEnemy(Enemy* enemy, vec3 userPos, Terrain *);

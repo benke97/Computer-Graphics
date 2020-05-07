@@ -40,9 +40,9 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
 
       // Create paricles on gun pos
       vec3 initSpeed = ScalarMult(Normalize(gun->direction), 2);
-      vec4 targetColor = {1,0,0,0.5};
+      vec4 targetColor = {1,0,0,0.8};
       vec3 initPosition = {gun->position.x + initSpeed.x - 0.1, gun->position.y + initSpeed.y - 0.1, gun->position.z + initSpeed.z - 0.1};
-      generateParticles(particleGen, 100, initSpeed, initPosition, 0.1f, targetColor, 0.01f, 0.15f, 1.0f);
+      generateParticles(particleGen, 100, initSpeed, initPosition, 0.1f, targetColor, 0.01f, 0.2f, 1.0f);
     }
   }
 	else {
@@ -148,10 +148,18 @@ void RemoveLasers(LaserHandler* laserhandler){
 	}
 }
 
-void displayLaserLight (LaserHandler* laserhandler, Terrain * terrain) {
+void displayLaserLight (LaserHandler* laserhandler, Terrain * terrain, GLuint enemyShader) {
   glUseProgram(terrain->shader);
   glUniform1i(glGetUniformLocation(terrain->shader, "LaserQuantity"), laserhandler->LaserQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "laserPositions"), laserhandler->LaserQuantity, &laserhandler->laserPositions[0].x);
 	glUniform1fv(glGetUniformLocation(terrain->shader, "laserIntensities"), laserhandler->LaserQuantity, &laserhandler->laserIntensities[0]);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "laserColors"), laserhandler->LaserQuantity, &laserhandler->laserColors[0].x);
+
+  glUseProgram(enemyShader);
+  
+  glUniform1i(glGetUniformLocation(enemyShader, "LaserQuantity"), laserhandler->LaserQuantity);
+	glUniform3fv(glGetUniformLocation(enemyShader, "laserPositions"), laserhandler->LaserQuantity, &laserhandler->laserPositions[0].x);
+	glUniform1fv(glGetUniformLocation(enemyShader, "laserIntensities"), laserhandler->LaserQuantity, &laserhandler->laserIntensities[0]);
+	glUniform3fv(glGetUniformLocation(enemyShader, "laserColors"), laserhandler->LaserQuantity, &laserhandler->laserColors[0].x);
+
 }

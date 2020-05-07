@@ -29,6 +29,6 @@ void RemoveLasers(LaserHandler*);
 void CheckLaserCollisions (LaserHandler* laserhandler, Terrain * floor, Terrain * roof);
 void MoveAllLasers(LaserHandler*, mat4*,mat4);
 void CheckForNewLasers (LaserHandler* laserhandler, User * user, Gun * gun, mat4 projectionMatrix, ParticleGenerator* particleGen);
-void displayLaserLight (LaserHandler* laserhandler, Terrain * terrain);
+void displayLaserLight (LaserHandler* laserhandler, Terrain * terrain, GLuint enemyShader);
 
 #endif

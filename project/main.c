@@ -32,6 +32,7 @@ ParticleGenerator* FLParticleGen;
 ParticleGenerator* FlareParticleGen;
 CollisionHandler* collisionhandler;
 ParticleGenerator* GunParticleGen;
+GLuint enemyShader;
 
 void init(void)
 {
@@ -63,15 +64,18 @@ void init(void)
 	// init shaders
 	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
 	glUseProgram(PGshaderID);
-	FLParticleGen = createParticleGenerator(100000, &PGshaderID);
+	FLParticleGen = createParticleGenerator(100000, &PGshaderID, "textures/ParticleTextureSQUARE.tga");
 
 	// Particle generator flare
 	glUseProgram(PGshaderID);
-	FlareParticleGen = createParticleGenerator(100000, &PGshaderID);
+	FlareParticleGen = createParticleGenerator(100000, &PGshaderID, "textures/ParticleTextureSTAR.tga");
 
 	// Particle generator flare
 	glUseProgram(PGshaderID);
-	GunParticleGen = createParticleGenerator(100000, &PGshaderID);
+	GunParticleGen = createParticleGenerator(100000, &PGshaderID, "textures/ParticleTexture2.tga");
+
+	// init enemyShader
+	enemyShader = loadShaders("shaders/enemy.vert", "shaders/enemy.frag");
 
 }
 
@@ -87,12 +91,12 @@ void display(void)
 
 	CheckForNewLightBalls(lightballhandler, user, projectionMatrix);
 	CheckForNewFlares(flarehandler, user, projectionMatrix);
-	CheckForNewEnemies(enemyhandler, user, terrain_floor, projectionMatrix);
+	CheckForNewEnemies(enemyhandler, user, terrain_floor, projectionMatrix, enemyShader);
 
 
 
-	displayFlaresLight (flarehandler, terrain_floor);
-	displayLightBallsLight (lightballhandler, terrain_floor);
+	displayFlaresLight (flarehandler, terrain_floor, enemyShader);
+	displayLightBallsLight (lightballhandler, terrain_floor, enemyShader);
 	//displayEnemiesLight (enemyhandler, terrain_floor);
 	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
 
@@ -118,7 +122,7 @@ void display(void)
 
 
 	CheckForNewLasers(laserhandler,user,gun,projectionMatrix, GunParticleGen);
-	displayLaserLight (laserhandler, terrain_floor);
+	displayLaserLight (laserhandler, terrain_floor, enemyShader);
 	CheckLaserCollisions(laserhandler, terrain_floor, roof);
 	MoveAllLasers(laserhandler,&camMatrix, projectionMatrix);
 	RemoveLasers(laserhandler);
@@ -145,14 +149,22 @@ void display(void)
   glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightCutOff"), flashlight->cutOffAngle);
 	glUniform1f(glGetUniformLocation(terrain_floor->shader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 
+	// Upload on or off
+	glUniform1i(glGetUniformLocation(terrain_floor->shader, "toggleFlashLight"), user->toggleFlashLight);
+
 	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler);
 	glUseProgram(gun->shader);
 	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
 
 
 
-
-
+	glUseProgram(enemyShader);
+	glUniform3f(glGetUniformLocation(enemyShader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
+  glUniform3f(glGetUniformLocation(enemyShader, "flashlightDirection"), flashlight->direction.x, flashlight->direction.y, flashlight->direction.z);
+  glUniform1f(glGetUniformLocation(enemyShader, "flashlightCutOff"), flashlight->cutOffAngle);
+	glUniform1f(glGetUniformLocation(enemyShader, "flashlightOuterCutOff"), flashlight->outerCutOff);
+	// Upload on or off
+	glUniform1i(glGetUniformLocation(enemyShader, "toggleFlashLight"), user->toggleFlashLight);
 
 
 
