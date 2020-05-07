@@ -152,7 +152,7 @@ void display(void)
 	// Upload on or off
 	glUniform1i(glGetUniformLocation(terrain_floor->shader, "toggleFlashLight"), user->toggleFlashLight);
 
-	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler);
+	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler, user);
 	glUseProgram(gun->shader);
 	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
 
@@ -165,6 +165,11 @@ void display(void)
 	glUniform1f(glGetUniformLocation(enemyShader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 	// Upload on or off
 	glUniform1i(glGetUniformLocation(enemyShader, "toggleFlashLight"), user->toggleFlashLight);
+
+	if (user->gameover) {
+		user->cam = SetVector(25,200,-100);
+
+	}
 
 
 

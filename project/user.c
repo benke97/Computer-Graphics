@@ -34,6 +34,7 @@ void initUser (User * user) {
 	user->speed = 1;
 	user->toggleFlashLight = false;
 	user->toggleFlashLightTimer = 5;
+	user->gameover = false;
 }
 
 
