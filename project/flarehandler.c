@@ -84,7 +84,7 @@ void CheckFlaresCollisions (FlareHandler* flarehandler, Terrain * floor, Terrain
   }
 }
 
-void MoveAllFlares(FlareHandler* flarehandler){
+void MoveAllFlares(FlareHandler* flarehandler, ParticleGenerator* particleGen){
   for (int ball=0; ball < flarehandler->FlaresQuantity; ball++){
     Flare * flare = &flarehandler->flares[ball];
 
@@ -94,6 +94,13 @@ void MoveAllFlares(FlareHandler* flarehandler){
     }
 
     flarehandler->flaresIntensities[ball] = flare->intensity*30;
+
+    //PARTICLES
+    float intense = pow(flare->intensity, 2);
+    vec3 initSpeed = ScalarMult(Normalize(flare->direction), 1);
+    vec4 targetColor = {1,1,0,0.5};
+    vec3 initPosition = {flare->position.x, flare->position.y, flare->position.z};
+    generateParticles(particleGen, 1000 * intense, initSpeed, initPosition, 0.7f * intense, targetColor, 0.01f, 0.3f, 1.0f);
   }
 }
 

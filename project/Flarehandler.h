@@ -7,6 +7,7 @@
 #include "Terrain.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "ParticleGenerator.h"
 
 
 
@@ -25,7 +26,7 @@ void initFlareHandler(FlareHandler*);
 FlareHandler* createFlareHandler();
 void diaplayFlares (FlareHandler*, mat4 *camMatrix);
 void CheckForNewFlares (FlareHandler*, User *, mat4);
-void MoveAllFlares(FlareHandler*);
+void MoveAllFlares(FlareHandler*, ParticleGenerator* particleGen);
 void RemoveFlares(FlareHandler*);
 void CheckFlaresCollisions (FlareHandler*, Terrain *, Terrain *);
 

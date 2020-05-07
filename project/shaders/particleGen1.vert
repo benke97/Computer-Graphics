@@ -7,7 +7,7 @@ layout(location = 2) in vec4 color; // Position of the center of the particule a
 
 // Output data ; will be interpolated for each fragment.
 out vec4 particleColor;
-//out vec2 UV;
+out vec2 UV;
 
 // Values that stay constant for the whole mesh.
 uniform vec3 CameraRightWorldSpace;
@@ -58,6 +58,6 @@ void main(void)
   gl_Position = ProjectionMatrix * modelView2 * vec4(vertexPosition_worldspace, 1.0f);
 
 
-	//UV = squareVertices.xy + vec2(0.5, 0.5);
+	UV = squareVertices.xy + vec2(0.5, 0.5);
 	particleColor = clamp(color, 0, 1);
 }
