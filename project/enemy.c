@@ -5,9 +5,9 @@
 #include "GL_utilities.h"
 
 
-void initEnemy(Enemy* this, mat4 projectionMatrix) {
+void initEnemy(Enemy* this, mat4 projectionMatrix, GLuint enemyShader) {
 
-  this->shader = loadShaders("shaders/enemy.vert", "shaders/enemy.frag");
+  this->shader = enemyShader;// loadShaders("shaders/enemy.vert", "shaders/enemy.frag");
   glUseProgram(this->shader);
   printError("init enemy shader");
   this->position = SetVector(0,0,0);
@@ -28,9 +28,9 @@ void initEnemy(Enemy* this, mat4 projectionMatrix) {
 };
 
 
-Enemy* createEnemy(mat4 projectionMatrix) {
+Enemy* createEnemy(mat4 projectionMatrix, GLuint enemyShader) {
   Enemy* result = (Enemy*) malloc(sizeof(Enemy));
-  initEnemy(result, projectionMatrix);
+  initEnemy(result, projectionMatrix, enemyShader);
   return result;
 };
 
@@ -53,6 +53,8 @@ void displayEnemy(Enemy* enemy, mat4 * wtvMatrixp, mat4 trans, mat4 rot1) {
   glUniformMatrix4fv(glGetUniformLocation(enemy->shader, "wtvMatrix"), 1, GL_TRUE, wtvMatrix.m);
   mat4 total;
   total = Mult(trans, rot1);
+  mat4 scale = S(0.02, 0.02, 0.02);
+  total = Mult(total,scale);
   glUniformMatrix4fv(glGetUniformLocation(enemy->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
   glUniform1f(glGetUniformLocation(enemy->shader, "LifeTimer"), enemy->lifeTimer);
   DrawModel(enemy->model, enemy->shader, "in_Position", "in_Normal", "inTexCoord");

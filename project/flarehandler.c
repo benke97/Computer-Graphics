@@ -100,7 +100,7 @@ void MoveAllFlares(FlareHandler* flarehandler, ParticleGenerator* particleGen){
     vec3 initSpeed = ScalarMult(Normalize(flare->direction), 1);
     vec4 targetColor = {1,1,0,0.5};
     vec3 initPosition = {flare->position.x, flare->position.y, flare->position.z};
-    generateParticles(particleGen, 1000 * intense, initSpeed, initPosition, 0.7f * intense, targetColor, 0.01f, 0.3f, 1.0f);
+    generateParticles(particleGen, 1000 * intense, initSpeed, initPosition, 0.7f * intense, targetColor, 0.01f, 0.5f, 1.0f);
   }
 }
 
@@ -140,7 +140,7 @@ void RemoveFlares(FlareHandler* flarehandler){
 	}
 }
 
-void displayFlaresLight (FlareHandler* flarehandler, Terrain * terrain) {
+void displayFlaresLight (FlareHandler* flarehandler, Terrain * terrain, GLuint enemyShader) {
   glUseProgram(terrain->shader);
   //printf("x-pos: %f", flarehandler->flaresPositions[0].x);
   //printf("x-int: %f \n", flarehandler->flaresIntensities[0]);
@@ -149,4 +149,12 @@ void displayFlaresLight (FlareHandler* flarehandler, Terrain * terrain) {
 	glUniform3fv(glGetUniformLocation(terrain->shader, "FlaresPositions"), flarehandler->FlaresQuantity, &flarehandler->flaresPositions[0].x);
 	glUniform1fv(glGetUniformLocation(terrain->shader, "FlaresIntensities"), flarehandler->FlaresQuantity, &flarehandler->flaresIntensities[0]);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "FlaresColor"), flarehandler->FlaresQuantity, &flarehandler->flaresColor[0].x);
+
+  glUseProgram(enemyShader);
+  
+  glUniform1i(glGetUniformLocation(enemyShader, "FlaresQuantity"), flarehandler->FlaresQuantity);
+	glUniform3fv(glGetUniformLocation(enemyShader, "FlaresPositions"), flarehandler->FlaresQuantity, &flarehandler->flaresPositions[0].x);
+	glUniform1fv(glGetUniformLocation(enemyShader, "FlaresIntensities"), flarehandler->FlaresQuantity, &flarehandler->flaresIntensities[0]);
+	glUniform3fv(glGetUniformLocation(enemyShader, "FlaresColor"), flarehandler->FlaresQuantity, &flarehandler->flaresColor[0].x);
+
 }

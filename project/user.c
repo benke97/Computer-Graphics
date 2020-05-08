@@ -32,6 +32,9 @@ void initUser (User * user) {
 	user->enemyShootingActivated = false;
 	user->flareShootingActivated = false;
 	user->speed = 1;
+	user->toggleFlashLight = false;
+	user->toggleFlashLightTimer = 5;
+	user->gameover = false;
 }
 
 
@@ -140,6 +143,20 @@ void userInput(User * user, Terrain * roof, Terrain * floor)
 	if( glutMouseIsDown(GLUT_MIDDLE_BUTTON))
 	{
 		user->laser_shooting_activated = true;
+	}
+
+	if (glutKeyIsDown('1') && user->toggleFlashLightTimer == 5)
+	{
+		user->toggleFlashLight = !user->toggleFlashLight;
+		user->toggleFlashLightTimer--;
+	}
+	else if (user->toggleFlashLightTimer == 0)
+	{
+		user->toggleFlashLightTimer = 5;
+	}
+	else
+	{
+		user->toggleFlashLightTimer--;
 	}
 }
 

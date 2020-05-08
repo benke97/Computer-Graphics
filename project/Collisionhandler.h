@@ -20,6 +20,6 @@ typedef struct CollisionHandler {
 
 void initCollisionHandler(CollisionHandler*);
 CollisionHandler* createCollisionHandler();
-void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* enemyhandler, LaserHandler* laserhandler); 
+void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* enemyhandler, LaserHandler* laserhandler, User * user); 
 
 #endif

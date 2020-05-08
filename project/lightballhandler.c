@@ -88,6 +88,9 @@ void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix, Part
       MoveLightBall(lightball);
       lightballhandler->lightBallsPositions[ball] = lightball->position;
     }
+    else {
+      lightball->lifeTimer--;
+    }
 
 
     lightballhandler->lightBallsIntensities[ball] = lightball->intensity;
@@ -101,7 +104,7 @@ void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix, Part
     vec3 initSpeed = ScalarMult(Normalize(lightball->direction), 1);
   	vec4 initColor = {1,0,0,0.5};
     vec3 initPosition = {lightball->position.x, lightball->position.y + 1, lightball->position.z};
-    generateParticles(particleGen, 1000, initSpeed, initPosition, 1.1f, initColor, 0.05f, 0.3f, 1.0f);
+    generateParticles(particleGen, 1000, initSpeed, initPosition, 1.1f, initColor, 0.05f, 0.4f, 1.0f);
   }
 }
 
@@ -141,10 +144,18 @@ void RemoveLightBalls(LightBallHandler* lightballhandler){
 	}
 }
 
-void displayLightBallsLight (LightBallHandler* lightballhandler, Terrain * terrain) {
+void displayLightBallsLight (LightBallHandler* lightballhandler, Terrain * terrain, GLuint enemyShader) {
   glUseProgram(terrain->shader);
   glUniform1i(glGetUniformLocation(terrain->shader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
 	glUniform1fv(glGetUniformLocation(terrain->shader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
+
+  glUseProgram(enemyShader);
+  
+  glUniform1i(glGetUniformLocation(enemyShader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
+	glUniform3fv(glGetUniformLocation(enemyShader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
+	glUniform1fv(glGetUniformLocation(enemyShader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);
+	glUniform3fv(glGetUniformLocation(enemyShader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
+
 }

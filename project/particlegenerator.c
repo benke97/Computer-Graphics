@@ -3,7 +3,7 @@
 
 
 
-void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint* shaderID)
+void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint* shaderID, char* textureFile)
 {
 
   particleGen->shaderID = *shaderID;
@@ -35,15 +35,15 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
 
   particleGen->deltaTime = 0;
 
-  LoadTGATextureSimple("textures/ParticleTexture2.tga", &particleGen->particleTexture);
+  LoadTGATextureSimple(textureFile, &particleGen->particleTexture);
 
   printError("Init partgen");
 }
 
-ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint* shaderID)
+ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint* shaderID, char* textureFile)
 {
   ParticleGenerator* result = (ParticleGenerator*)malloc(sizeof(ParticleGenerator));
-  init__ParticleGenerator(result, maxNrParticles, shaderID);
+  init__ParticleGenerator(result, maxNrParticles, shaderID, textureFile);
 
   return result;
 }

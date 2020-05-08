@@ -22,13 +22,13 @@ EnemyHandler* createEnemyHandler() {
 };
 
 
-void CheckForNewEnemies (EnemyHandler* enemyhandler, User * user, Terrain * floor, mat4 projectionMatrix){
+void CheckForNewEnemies (EnemyHandler* enemyhandler, User * user, Terrain * floor, mat4 projectionMatrix, GLuint enemyShader){
   bool newEnemy = user->enemyShootingActivated || enemyhandler->timeUntilNextEnemy < 0;
   bool enemyLimitReached = enemyhandler->EnemiesQuantity > 99;
   if (newEnemy && !enemyLimitReached) {
     Enemy * enemy;
 
-    enemy = createEnemy(projectionMatrix);
+    enemy = createEnemy(projectionMatrix, enemyShader);
     enemyhandler->enemiesColor[enemyhandler->EnemiesQuantity] = SetVector(1.0f, 1.0f, 0.0f);
 
     bool goodPositionFound = false;

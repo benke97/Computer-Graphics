@@ -36,8 +36,8 @@ typedef struct
 } ParticleGenerator;
 
 // Init shaders before and pass shaderID
-void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint* shaderID);
-ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint* shaderID);
+void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint* shaderID, char* textureFile);
+ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint* shaderID, char* textureFile);
 void delete_ParticleGeneratorData(ParticleGenerator* particleGen);
 
 void initParticleVertexBuffer(GLfloat* vertexbuffer);
