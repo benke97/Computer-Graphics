@@ -15,6 +15,7 @@
 #include "Laserhandler.h"
 #include "Enemyhandler.h"
 #include "Collisionhandler.h"
+#include "Gameoverhandler.h"
 
 mat4 projectionMatrix;
 Terrain* terrain_floor;
@@ -31,8 +32,10 @@ GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
 ParticleGenerator* FlareParticleGen;
 CollisionHandler* collisionhandler;
+GameOverHandler* gameoverhandler;
 ParticleGenerator* GunParticleGen;
 GLuint enemyShader;
+
 
 void init(void)
 {
@@ -52,6 +55,7 @@ void init(void)
 	laserhandler = createLaserHandler();
 	enemyhandler = createEnemyHandler();
 	collisionhandler = createCollisionHandler();
+	gameoverhandler = createGameOverHandler();
 	// Place flashlight on user position with direction of lookAtPoint
   //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
 	flashlight = createFlashLight(user);
@@ -77,6 +81,8 @@ void init(void)
 	// init enemyShader
 	enemyShader = loadShaders("shaders/enemy.vert", "shaders/enemy.frag");
 
+
+
 }
 
 void display(void)
@@ -88,6 +94,14 @@ void display(void)
 				user->upVector.x, user->upVector.y, user->upVector.z);
 
 	printError("pre display");
+
+
+	if (user->gameover) {
+		HandleGameOver(gameoverhandler, user, projectionMatrix, flashlight);
+
+
+	}
+	else{
 
 	CheckForNewLightBalls(lightballhandler, user, projectionMatrix);
 	CheckForNewFlares(flarehandler, user, projectionMatrix);
@@ -166,10 +180,7 @@ void display(void)
 	// Upload on or off
 	glUniform1i(glGetUniformLocation(enemyShader, "toggleFlashLight"), user->toggleFlashLight);
 
-	if (user->gameover) {
-		user->cam = SetVector(25,200,-100);
 
-	}
 
 
 
@@ -202,6 +213,9 @@ void display(void)
 	// gun particles
 	simulateAllParticles(GunParticleGen, user, 0);
 	drawAllParticles(GunParticleGen, &camMatrix, projectionMatrix);
+
+
+	}
 
 	glutSwapBuffers();
 }
