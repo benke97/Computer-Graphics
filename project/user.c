@@ -1,6 +1,7 @@
 #ifdef __APPLE__
 	#include <OpenGL/gl3.h>
 	#define GLUT_KEY_LEFT_SHIFT GLUT_KEY_TAB
+	#define GLUT_MIDDLE_BUTTON GLUT_RIGHT_BUTTON
 	// Linking hint for Lightweight IDE
 	// uses framework Cocoa
 #endif
