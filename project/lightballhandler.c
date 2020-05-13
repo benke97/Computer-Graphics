@@ -10,7 +10,6 @@
 void initLightBallHandler(LightBallHandler* lightballhandler) {
   lightballhandler->LightBallsQuantity = 0;
   lightballhandler->timeUntilNextBall = 0;
-  lightballhandler->maxDistance = 200;
 };
 
 
@@ -53,7 +52,6 @@ void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * flo
     vec3 floorNormal = getNormal(x, z, floor);
     vec3 roofNormal = getNormal(x, z, roof);
 
-//    if(lightball->position.y < floorheight || lightball->position.y > roofheight - 1){
     if(lightball->position.y < floorheight || lightball->position.y > roofheight - 5){
 
       lightball->flying = false;
@@ -65,8 +63,6 @@ void CheckLighballsCollisions (LightBallHandler* lightballhandler, Terrain * flo
       }
 
       lightball->lifeTimer--;
-
-
 
       if(lightball->position.y < floorheight ) {
       lightballhandler->lightBallsPositions[ball] = VectorSub(lightball->position, ScalarMult(floorNormal, -1));
@@ -111,8 +107,7 @@ void MoveAllLightBalls(LightBallHandler* lightballhandler, mat4 *camMatrix, Part
 void RemoveLightBalls(LightBallHandler* lightballhandler){
 
   for (int ball=0; ball < lightballhandler->LightBallsQuantity; ball++){
-  LightBall * lightball = &lightballhandler->lightballs[ball];
-    //if (Norm(lightball->position) > lightballhandler->maxDistance) {
+    LightBall * lightball = &lightballhandler->lightballs[ball];
     if (lightball->lifeTimer < -50) {
       lightball->active = false;
     }
@@ -152,7 +147,7 @@ void displayLightBallsLight (LightBallHandler* lightballhandler, Terrain * terra
 	glUniform3fv(glGetUniformLocation(terrain->shader, "lightBallsColor"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsColor[0].x);
 
   glUseProgram(enemyShader);
-  
+
   glUniform1i(glGetUniformLocation(enemyShader, "LightBallsQuantity"), lightballhandler->LightBallsQuantity);
 	glUniform3fv(glGetUniformLocation(enemyShader, "lightBallsPositions"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsPositions[0].x);
 	glUniform1fv(glGetUniformLocation(enemyShader, "lightBallsIntensities"), lightballhandler->LightBallsQuantity, &lightballhandler->lightBallsIntensities[0]);

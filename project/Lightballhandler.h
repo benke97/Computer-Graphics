@@ -18,7 +18,6 @@ typedef struct LightBallHandler {
   LightBall lightballs[100];
   int LightBallsQuantity;
   int timeUntilNextBall;
-  int maxDistance;
 } LightBallHandler;
 
 

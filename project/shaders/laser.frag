@@ -11,11 +11,5 @@ uniform sampler2D texUnit;
 
 void main(void)
 {
-	//const vec3 light = vec3(0.58, 0.58, 0.58);
-	//float shade;
-	//shade = dot(normalize(fragNormal), light);
-	//shade = clamp(shade, 0, 1);
-	//float time = sin(t/1000);
-	//out_Color = shade*texture(texUnit, outTexCoord * 10);
   out_Color = vec4(1.0,0,0,0);
 }

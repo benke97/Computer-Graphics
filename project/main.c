@@ -28,7 +28,6 @@ LightBallHandler* lightballhandler;
 LaserHandler* laserhandler;
 FlareHandler* flarehandler;
 EnemyHandler* enemyhandler;
-GLfloat specularExponent = 100;
 ParticleGenerator* FLParticleGen;
 ParticleGenerator* FlareParticleGen;
 CollisionHandler* collisionhandler;
@@ -55,17 +54,15 @@ void init(void)
 	laserhandler = createLaserHandler();
 	enemyhandler = createEnemyHandler();
 	collisionhandler = createCollisionHandler();
-	gameoverhandler = createGameOverHandler();
-	// Place flashlight on user position with direction of lookAtPoint
-  //vec3 dir = VectorSub(user->lookAtPoint, user->cam);
+	gameoverhandler = createGameOverHandler(projectionMatrix);
 	flashlight = createFlashLight(user);
 	gun = createGun(user);
 	gun2 = createGun(user);
+
   LoadTGATextureSimple("textures/stoneee.tga", &terrain_floor->terrain_texture);
 	LoadTGATextureSimple("textures/stoneee.tga", &roof->terrain_texture);
 
 	// Particle Generator lightball
-	// init shaders
 	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
 	glUseProgram(PGshaderID);
 	FLParticleGen = createParticleGenerator(100000, &PGshaderID, "textures/ParticleTextureSQUARE.tga");
@@ -80,26 +77,19 @@ void init(void)
 
 	// init enemyShader
 	enemyShader = loadShaders("shaders/enemy.vert", "shaders/enemy.frag");
-
-
-
 }
 
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	mat4 camMatrix;
 	camMatrix = lookAt(user->cam.x, user->cam.y, user->cam.z,
 				user->lookAtPoint.x, user->lookAtPoint.y, user->lookAtPoint.z,
 				user->upVector.x, user->upVector.y, user->upVector.z);
 
-	printError("pre display");
-
-
 	if (user->gameover) {
-		HandleGameOver(gameoverhandler, user, projectionMatrix, flashlight);
-
-
+		HandleGameOver(gameoverhandler, user, projectionMatrix);
 	}
 	else{
 
@@ -107,14 +97,11 @@ void display(void)
 	CheckForNewFlares(flarehandler, user, projectionMatrix);
 	CheckForNewEnemies(enemyhandler, user, terrain_floor, projectionMatrix, enemyShader);
 
-
-
 	displayFlaresLight (flarehandler, terrain_floor, enemyShader);
 	displayLightBallsLight (lightballhandler, terrain_floor, enemyShader);
-	//displayEnemiesLight (enemyhandler, terrain_floor);
-	displayTerrain(terrain_floor, roof, specularExponent, user->cam, &camMatrix);
 
-//LightBalls
+	displayTerrain(terrain_floor, roof, user->cam, &camMatrix);
+
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
  	MoveAllLightBalls(lightballhandler, &camMatrix, FLParticleGen);
  	RemoveLightBalls(lightballhandler);
@@ -124,16 +111,9 @@ void display(void)
 	RemoveFlares(flarehandler);
 	diaplayFlares (flarehandler, &camMatrix);
 
-
-
-
-
-	CheckEnemiesCollisions (enemyhandler, terrain_floor, roof);
 	MoveAllEnemies(enemyhandler, user, terrain_floor);
 	RemoveEnemies(enemyhandler);
 	diaplayEnemies (enemyhandler, &camMatrix, user);
-
-
 
 	CheckForNewLasers(laserhandler,user,gun,projectionMatrix, GunParticleGen);
 	displayLaserLight (laserhandler, terrain_floor, enemyShader);
@@ -141,13 +121,11 @@ void display(void)
 	MoveAllLasers(laserhandler,&camMatrix, projectionMatrix);
 	RemoveLasers(laserhandler);
 
-  // FlashLight
-
-
 	drawGun(gun, projectionMatrix);
 	displayGun(gun, &camMatrix, angle, yangle);
 	drawFlashlight(flashlight, projectionMatrix);
 	displayFlashlight(flashlight, &camMatrix,angle,yangle);
+
 	//dummy object for solving textureproblem
 	drawGun(gun2, projectionMatrix);
 	displayGun(gun2, &camMatrix, angle, yangle);
@@ -167,10 +145,9 @@ void display(void)
 	glUniform1i(glGetUniformLocation(terrain_floor->shader, "toggleFlashLight"), user->toggleFlashLight);
 
 	checkCollisionHandler(lightballhandler, enemyhandler, laserhandler, user);
+
 	glUseProgram(gun->shader);
 	glUniform1f(glGetUniformLocation(gun->shader, "heat"), gun->heat);
-
-
 
 	glUseProgram(enemyShader);
 	glUniform3f(glGetUniformLocation(enemyShader, "flashlightPosition"), flashlight->position.x, flashlight->position.y, flashlight->position.z);
@@ -213,8 +190,6 @@ void display(void)
 	// gun particles
 	simulateAllParticles(GunParticleGen, user, 0);
 	drawAllParticles(GunParticleGen, &camMatrix, projectionMatrix);
-
-
 	}
 
 	glutSwapBuffers();
@@ -233,7 +208,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitContextVersion(3, 2);
-	glutInitWindowSize (1200, 800);
+	glutInitWindowSize (1800, 1200);
 	glutCreateWindow ("Laser DOOM");
 	glutDisplayFunc(display);
 	init ();

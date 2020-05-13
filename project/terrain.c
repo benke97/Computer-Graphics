@@ -218,12 +218,11 @@ vec3 getNormal(float xPos, float zPos, Terrain* terrain)
   return norm;
 }
 
-void displayTerrain(Terrain * floor, Terrain * roof, float specularExponent, vec3 cam, mat4 * camMatrix) {
+void displayTerrain(Terrain * floor, Terrain * roof, vec3 cam, mat4 * camMatrix) {
   glUseProgram(floor->shader);
   mat4 modelView = IdentityMatrix();
   mat4 total = Mult(*camMatrix, modelView);
 
-	glUniform1f(glGetUniformLocation(floor->shader, "specularExponent"), specularExponent);
 	glUniform3f(glGetUniformLocation(floor->shader, "camPos"), cam.x, cam.y, cam.z);
 
   glUniformMatrix4fv(glGetUniformLocation(floor->shader, "mdlMatrix"), 1, GL_TRUE, total.m);

@@ -9,7 +9,6 @@
 void initLaserHandler(LaserHandler* laserhandler) {
   laserhandler->LaserQuantity = 0;
   laserhandler->timeUntilNextLaser = 0;
-  laserhandler->maxDistance = 200;
 };
 
 
@@ -156,7 +155,7 @@ void displayLaserLight (LaserHandler* laserhandler, Terrain * terrain, GLuint en
 	glUniform3fv(glGetUniformLocation(terrain->shader, "laserColors"), laserhandler->LaserQuantity, &laserhandler->laserColors[0].x);
 
   glUseProgram(enemyShader);
-  
+
   glUniform1i(glGetUniformLocation(enemyShader, "LaserQuantity"), laserhandler->LaserQuantity);
 	glUniform3fv(glGetUniformLocation(enemyShader, "laserPositions"), laserhandler->LaserQuantity, &laserhandler->laserPositions[0].x);
 	glUniform1fv(glGetUniformLocation(enemyShader, "laserIntensities"), laserhandler->LaserQuantity, &laserhandler->laserIntensities[0]);

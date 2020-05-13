@@ -29,7 +29,6 @@ void CheckForNewFlares (FlareHandler*, User *, mat4);
 void MoveAllFlares(FlareHandler*, ParticleGenerator* particleGen);
 void RemoveFlares(FlareHandler*);
 void CheckFlaresCollisions (FlareHandler*, Terrain *, Terrain *);
-
 void displayFlaresLight (FlareHandler* lightballhandler, Terrain * terrain, GLuint enemyShader);
 
 #endif

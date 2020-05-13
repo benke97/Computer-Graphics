@@ -26,5 +26,5 @@ float heightFinder(float xPos, float zPos, Terrain* terrain);
 float heightdiff(float xPos, float zPos, Terrain* roof, Terrain* floor);
 float slidedown(float xPos1, float zPos1, float xPos2, float zPos2, Terrain* floor);
 vec3 getNormal(float xPos, float zPos, Terrain* floor);
-void displayTerrain(Terrain * floor, Terrain * roof, float specularExponent, vec3 cam, mat4 * camMatrix);
+void displayTerrain(Terrain * floor, Terrain * roof, vec3 cam, mat4 * camMatrix);
 #endif

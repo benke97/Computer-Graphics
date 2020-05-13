@@ -19,8 +19,8 @@ typedef struct GameOverHandler {
 } GameOverHandler;
 
 
-void initGameOverHandler(GameOverHandler*);
-GameOverHandler* createGameOverHandler();
-void HandleGameOver(GameOverHandler* gameoverhandler, User* user, mat4 projectionMatrix,  FlashLight * flashlight);
+void initGameOverHandler(GameOverHandler*, mat4 projectionMatrix);
+GameOverHandler* createGameOverHandler(mat4 projectionMatrix);
+void HandleGameOver(GameOverHandler* gameoverhandler, User* user, mat4 projectionMatrix);
 
 #endif

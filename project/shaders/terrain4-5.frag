@@ -9,13 +9,13 @@ in vec3 outPosition;
 //uniform sampler2D tex;
 uniform sampler2D terrain_texture;
 
-//For ball:
+//For light Ball:
 uniform int LightBallsQuantity;
-uniform vec3 camPos;
 uniform vec3 lightBallsPositions[100];
 uniform vec3 lightBallsColor[100];
 uniform float lightBallsIntensities[100];
-uniform float specularExponent;
+
+uniform vec3 camPos;
 
 // For flashlight:
 uniform vec3 flashlightPosition;
@@ -99,28 +99,11 @@ void main(void)
 
 		dist = distance(lightBallsPositions[i], outPosition) * 4;
 		light = normalize(lightBallsPositions[i] - outPosition)/dist*lightBallsIntensities[i];
-		//shade = abs(dot(normalize(fragnormal), light));
 		shade = dot(normalize(fragnormal), light);
 
 		shade = clamp(shade, 0, 1);
 		color = shade*lightBallsColor[i];
 		totcolor += color;
-
-		/*
-		// Specular shade
-		vec3 r = reflect(-light, fragnormal);
-		//vec3 r = 2*fragnormal*dot(light, fragnormal) - light;
-		vec3 eyeDir = normalize(camPos - outPosition);
-		if ( dot(light, fragnormal) > 0.0)
-		{
-			spec = dot(r, eyeDir);
-			float exp = specularExponent;
-			spec = max(spec, 0.01);
-			spec = pow(spec, specularExponent);
-			color = spec*lightBallsColor[i];
-			totcolor += color;
-		}
-		*/
 
 	}
 
@@ -129,7 +112,6 @@ void main(void)
 	{
 		dist = distance(laserPositions[i], outPosition) * 4;
 		light = normalize(laserPositions[i] - outPosition)/dist;
-		//shade = abs(dot(normalize(fragnormal), light));
 		shade = dot(normalize(fragnormal), light);
 
 		shade = clamp(shade, 0, 1);
@@ -143,13 +125,11 @@ void main(void)
 
 		dist = distance(FlaresPositions[i], outPosition) * 4;
 		light = normalize(FlaresPositions[i] - outPosition)/dist*FlaresIntensities[i];
-		//shade = abs(dot(normalize(fragnormal), light));
 		shade = dot(normalize(fragnormal), light);
 
 		shade = clamp(shade, 0, 1);
 		color = shade*FlaresColor[i];
 		totcolor += color;
-		//totcolor = vec3(1.0, 1.0, 1.0);
 	}
 
 	// ---------------------------------

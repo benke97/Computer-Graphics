@@ -8,18 +8,12 @@
 void initFlare(Flare* this, mat4 projectionMatrix) {
 
   this->shader = loadShaders("shaders/flare.vert", "shaders/flare.frag");
-  glUseProgram(this->shader);
-  printError("init flare shader");
   this->position = SetVector(0,0,0);
   this->active = true;
   this->flying = true;
   this->model = LoadModelPlus("models/octagon.obj");
   this->intensity = 1.0;
   this->lifeTimer = 0;
-
-  glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-
-  printError("init flare");
 
   drawFlare(this, projectionMatrix);
 };

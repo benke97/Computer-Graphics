@@ -11,14 +11,12 @@
 
 
 typedef struct EnemyHandler {
-  vec3 enemiesColor[100];
   vec3 enemiesPositions[100];
-  float enemiesIntensities[100];
   Enemy enemies[100];
 
   int EnemiesQuantity;
   int timeUntilNextEnemy;
-  int maxDistance;
+  
 } EnemyHandler;
 
 
@@ -28,7 +26,5 @@ void diaplayEnemies (EnemyHandler*, mat4 *camMatrix, User *);
 void CheckForNewEnemies (EnemyHandler*, User *,Terrain *, mat4, GLuint enemyShader);
 void MoveAllEnemies(EnemyHandler*, User *, Terrain * );
 void RemoveEnemies(EnemyHandler*);
-void CheckEnemiesCollisions (EnemyHandler*, Terrain *, Terrain *);
-void displayEnemiesLight (EnemyHandler*, Terrain * terrain);
 
 #endif
