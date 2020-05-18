@@ -6,15 +6,8 @@
 #include "LoadTGA.h"
 #include "GL_utilities.h"
 
-
-void initCollisionHandler(CollisionHandler* collisionhandler) {
-  printf("%i", 10);
-};
-
-
 CollisionHandler* createCollisionHandler() {
   CollisionHandler* result = (CollisionHandler*) malloc(sizeof(CollisionHandler));
-  initCollisionHandler(result);
   return result;
 };
 
@@ -32,6 +25,7 @@ void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* ene
       if (Norm(VectorSub(VectorAdd(enemyhandler->enemiesPositions[enemy], SetVector(0,1.5,0)), lightballhandler->lightBallsPositions[ball])) < 1.5){
         LightBall * lightball = &lightballhandler->lightballs[ball];
         lightball->flying = false;
+        
         if (lightball->lifeTimer > 1) {
           lightball->intensity = 2*lightball->lifeTimer;
         }
@@ -56,7 +50,6 @@ void checkCollisionHandler(LightBallHandler* lightballhandler, EnemyHandler* ene
     if (gotHitByLightBall) {
       enemyhandler->enemies[enemy].lifeTimer -= 1;
     }
-
 
   }
 }

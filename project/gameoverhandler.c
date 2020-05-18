@@ -7,26 +7,31 @@
 #include "GL_utilities.h"
 
 
-void initGameOverHandler(GameOverHandler* gameoverhandler) {
+void initGameOverHandler(GameOverHandler* gameoverhandler, mat4 projectionMatrix) {
   gameoverhandler->skybox = LoadModelPlus("models/skybox.obj");
   gameoverhandler->gameovermodel = LoadModelPlus("models/gameover.obj");
   gameoverhandler->skyboxshader = loadShaders("shaders/skybox.vert", "shaders/skybox.frag");
   LoadTGATextureSimple("textures/SkyBox512.tga", &gameoverhandler->skyTex);
-  gameoverhandler->shader = loadShaders("shaders/flashlight.vert", "shaders/flashlight.frag");
+  gameoverhandler->shader = loadShaders("shaders/gameover.vert", "shaders/gameover.frag");
 
+  glUseProgram(gameoverhandler->shader);
+  glUniformMatrix4fv(glGetUniformLocation(gameoverhandler->shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
+  glEnableVertexAttribArray(glGetAttribLocation(gameoverhandler->shader, "projectionMatrix"));
 };
 
 
-GameOverHandler* createGameOverHandler() {
+GameOverHandler* createGameOverHandler(mat4 projectionMatrix) {
   GameOverHandler* result = (GameOverHandler*) malloc(sizeof(GameOverHandler));
-  initGameOverHandler(result);
+  initGameOverHandler(result, projectionMatrix);
   return result;
 };
 
-void HandleGameOver(GameOverHandler* gameoverhandler, User* user, mat4 projectionMatrix, FlashLight * flashlight) {
+void HandleGameOver(GameOverHandler* gameoverhandler, User* user, mat4 projectionMatrix) {
+
+
+  user->cam = SetVector(25,2,-100);
 
   glDisable(GL_DEPTH_TEST);
-  user->cam = SetVector(25,2,-100);
 
   glUseProgram(gameoverhandler->skyboxshader);
   glUniform1i(glGetUniformLocation(gameoverhandler->skyboxshader, "texUnit"), 0);
@@ -45,16 +50,16 @@ void HandleGameOver(GameOverHandler* gameoverhandler, User* user, mat4 projectio
 
 
   glEnable(GL_DEPTH_TEST);
-  glUseProgram(flashlight->shader);
-  glUniformMatrix4fv(glGetUniformLocation(flashlight->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-  glEnableVertexAttribArray(glGetAttribLocation(flashlight->shader, "projectionMatrix"));
-  glUniformMatrix4fv(glGetUniformLocation(flashlight->shader, "wtvMatrix"), 1, GL_TRUE, camMatrix.m);
+  glUseProgram(gameoverhandler->shader);
+  glUniformMatrix4fv(glGetUniformLocation(gameoverhandler->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
+  glEnableVertexAttribArray(glGetAttribLocation(gameoverhandler->shader, "projectionMatrix"));
+  glUniformMatrix4fv(glGetUniformLocation(gameoverhandler->shader, "wtvMatrix"), 1, GL_TRUE, camMatrix.m);
   mat4 total;
   mat4 trans = T(user->cam.x + 200,user->cam.y,user->cam.z);
   mat4 rot1 = Ry(3*M_PI/2);
   total = Mult(trans, rot1);
-  glUniformMatrix4fv(glGetUniformLocation(flashlight->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
-  DrawModel(gameoverhandler->gameovermodel, flashlight->shader, "in_Position", "in_Normal", "inTexCoord");
+  glUniformMatrix4fv(glGetUniformLocation(gameoverhandler->shader, "mdlMatrix"), 1, GL_TRUE, total.m);
+  DrawModel(gameoverhandler->gameovermodel, gameoverhandler->shader, "in_Position", "in_Normal", "inTexCoord");
 
 
 }

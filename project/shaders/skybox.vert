@@ -2,11 +2,12 @@
 
 in  vec3 inPosition;
 in vec2 inTexCoord;
+
 out vec2 outTexCoord;
+
 uniform mat4 projectionMatrix;
 uniform mat4 mdlMatrix;
 uniform mat4 LookAtMatrix;
-
 
 void main(void)
 {

@@ -9,7 +9,6 @@
 void initLaserHandler(LaserHandler* laserhandler) {
   laserhandler->LaserQuantity = 0;
   laserhandler->timeUntilNextLaser = 0;
-  laserhandler->maxDistance = 200;
 };
 
 

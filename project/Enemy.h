@@ -11,10 +11,7 @@ typedef struct Enemy {
   Model *model;
   GLuint shader;
   vec3 position;
-  vec3 direction;
   bool active;
-  bool flying;
-  float intensity;
   float lifeTimer;
   GLuint texture;
 } Enemy;

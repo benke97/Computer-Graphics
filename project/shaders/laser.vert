@@ -13,7 +13,6 @@ uniform mat4 wtvMatrix;
 
 void main(void)
 {
-	//mat3 rotation = mat3(mdlMatrix);
 	fragNormal = in_Normal;
 	gl_Position = projectionMatrix*wtvMatrix*mdlMatrix*vec4(in_Position, 1.0);
 	outTexCoord = inTexCoord;

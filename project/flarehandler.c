@@ -10,7 +10,6 @@
 void initFlareHandler(FlareHandler* flarehandler) {
   flarehandler->FlaresQuantity = 0;
   flarehandler->timeUntilNextFlare = 0;
-  flarehandler->maxDistance = 200;
 };
 
 
@@ -62,23 +61,9 @@ void CheckFlaresCollisions (FlareHandler* flarehandler, Terrain * floor, Terrain
 
     float floorheight = heightFinder(x, z, floor);
     float roofheight = heightFinder(x, z, roof);
-    //vec3 floorNormal = getNormal(x, z, floor);
-    //vec3 roofNormal = getNormal(x, z, roof);
 
-//    if(flare->position.y < floorheight || flare->position.y > roofheight - 1){
     if(flare->position.y < floorheight || flare->position.y > roofheight - 5){
-
-      //flare->flying = false;
       flare->intensity -= 0.05;
-      /*
-      if(flare->position.y < floorheight ) {
-        flarehandler->flaresPositions[flare_ind] = VectorSub(flare->position, ScalarMult(floorNormal, -1));
-      }
-      else {
-        flarehandler->flaresPositions[flare_ind] = VectorSub(flare->position, ScalarMult(roofNormal, -3));
-      }
-      */
-
     }
 
   }
@@ -108,7 +93,6 @@ void RemoveFlares(FlareHandler* flarehandler){
 
   for (int ball=0; ball < flarehandler->FlaresQuantity; ball++){
   Flare * flare = &flarehandler->flares[ball];
-    //if (Norm(flare->position) > flarehandler->maxDistance) {
     if (flare->intensity < 0.01) {
       flare->active = false;
     }
@@ -142,16 +126,13 @@ void RemoveFlares(FlareHandler* flarehandler){
 
 void displayFlaresLight (FlareHandler* flarehandler, Terrain * terrain, GLuint enemyShader) {
   glUseProgram(terrain->shader);
-  //printf("x-pos: %f", flarehandler->flaresPositions[0].x);
-  //printf("x-int: %f \n", flarehandler->flaresIntensities[0]);
-  //printf("x-col: %f", flarehandler->flaresColor[0].x);
   glUniform1i(glGetUniformLocation(terrain->shader, "FlaresQuantity"), flarehandler->FlaresQuantity);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "FlaresPositions"), flarehandler->FlaresQuantity, &flarehandler->flaresPositions[0].x);
 	glUniform1fv(glGetUniformLocation(terrain->shader, "FlaresIntensities"), flarehandler->FlaresQuantity, &flarehandler->flaresIntensities[0]);
 	glUniform3fv(glGetUniformLocation(terrain->shader, "FlaresColor"), flarehandler->FlaresQuantity, &flarehandler->flaresColor[0].x);
 
   glUseProgram(enemyShader);
-  
+
   glUniform1i(glGetUniformLocation(enemyShader, "FlaresQuantity"), flarehandler->FlaresQuantity);
 	glUniform3fv(glGetUniformLocation(enemyShader, "FlaresPositions"), flarehandler->FlaresQuantity, &flarehandler->flaresPositions[0].x);
 	glUniform1fv(glGetUniformLocation(enemyShader, "FlaresIntensities"), flarehandler->FlaresQuantity, &flarehandler->flaresIntensities[0]);

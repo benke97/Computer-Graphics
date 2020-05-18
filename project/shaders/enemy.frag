@@ -17,7 +17,6 @@ uniform vec3 camPos;
 uniform vec3 lightBallsPositions[100];
 uniform vec3 lightBallsColor[100];
 uniform float lightBallsIntensities[100];
-uniform float specularExponent;
 
 // For flashlight:
 uniform vec3 flashlightPosition;
@@ -42,12 +41,6 @@ uniform float FlaresIntensities[100];
 void main(void)
 {
 	vec3 life = vec3(0.1 + (20 - LifeTimer)/20, 0.1, 0.1);
-	//const vec3 light = vec3(0.58, 0.58, 0.58);
-	//float shade;
-	//shade = dot(normalize(fragNormal), light);
-	//shade = clamp(shade, 0, 1);
-	//float time = sin(t/1000);
-	//out_Color = life * texture(texUnit, outTexCoord);
 
 	float shade = 0.0f;
 	vec3 color = vec3(0,0,0);
@@ -102,7 +95,6 @@ void main(void)
 
 		dist = distance(lightBallsPositions[i], outPosition) * 4;
 		light = normalize(lightBallsPositions[i] - outPosition)/dist*lightBallsIntensities[i];
-		//shade = abs(dot(normalize(fragNormal), light));
 		shade = dot(normalize(fragNormal), light);
 
 		shade = clamp(shade, 0, 1);
@@ -117,7 +109,6 @@ void main(void)
 	{
 		dist = distance(laserPositions[i], outPosition) * 4;
 		light = normalize(laserPositions[i] - outPosition)/dist;
-		//shade = abs(dot(normalize(fragNormal), light));
 		shade = dot(normalize(fragNormal), light);
 
 		shade = clamp(shade, 0, 1);
@@ -131,13 +122,11 @@ void main(void)
 
 		dist = distance(FlaresPositions[i], outPosition) * 4;
 		light = normalize(FlaresPositions[i] - outPosition)/dist*FlaresIntensities[i];
-		//shade = abs(dot(normalize(fragNormal), light));
 		shade = dot(normalize(fragNormal), light);
 
 		shade = clamp(shade, 0, 1);
 		color = shade*FlaresColor[i];
 		totcolor += color;
-		//totcolor = vec3(1.0, 1.0, 1.0);
 	}
 
 	// ---------------------------------
@@ -150,7 +139,5 @@ void main(void)
 	{
 		totcolor = vec3(0,0,1);
 	}*/
-	//out_Color = vec4(totcolor, 1);
 	out_Color = vec4(textur.x*(totcolor.x), textur.y*(totcolor.y), textur.z*(totcolor.z), 1.0);
-  //out_Color = vec4(1.0);
 }

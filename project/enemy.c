@@ -7,23 +7,14 @@
 
 void initEnemy(Enemy* this, mat4 projectionMatrix, GLuint enemyShader) {
 
-  this->shader = enemyShader;// loadShaders("shaders/enemy.vert", "shaders/enemy.frag");
+  this->shader = enemyShader;
   glUseProgram(this->shader);
-  printError("init enemy shader");
   this->position = SetVector(0,0,0);
   this->active = true;
-  this->flying = true;
   this->model = LoadModelPlus("models/FatTerrorist.obj");
-  this->intensity = 1.0;
   this->lifeTimer = 20;
   LoadTGATextureSimple("textures/FatTerrorist.tga", &this->texture);
-  //LoadTGATextureSimple("textures/conc.tga", &this->texture);
-
-
   glUniformMatrix4fv(glGetUniformLocation(this->shader, "projMatrix"), 1, GL_TRUE, projectionMatrix.m);
-
-  printError("init enemy");
-
   drawEnemy(this, projectionMatrix);
 };
 
@@ -67,7 +58,4 @@ void MoveEnemy(Enemy* enemy, vec3 userPos, Terrain * floor) {
     enemy->position.x = enemy->position.x - dx / 500;
     enemy->position.z = enemy->position.z - dz / 500;
     enemy->position.y = heightFinder(enemy->position.x, enemy->position.z, floor);
-    //enemy->position.y = 7.0 + 30*enemy->direction.y * enemy->lifeTimer - 9.82 * pow(enemy->lifeTimer, 2) / 2;
-    //enemy->lifeTimer += 0.015;
-    //enemy->intensity -= 0.005;
 }
