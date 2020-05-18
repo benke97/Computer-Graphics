@@ -39,7 +39,7 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
 
       // Create paricles on gun pos
       vec3 initSpeed = ScalarMult(Normalize(gun->direction), 2);
-      vec4 targetColor = {1,0,0,0.8};
+      vec4 targetColor = {1,0,0,0.8}; // red
       vec3 initPosition = {gun->position.x + initSpeed.x - 0.1, gun->position.y + initSpeed.y - 0.1, gun->position.z + initSpeed.z - 0.1};
       generateParticles(particleGen, 100, initSpeed, initPosition, 0.1f, targetColor, 0.01f, 0.2f, 1.0f);
     }
@@ -63,8 +63,9 @@ void CheckForNewLasers(LaserHandler* laserhandler,User * user, Gun * gun, mat4 p
 
   if (gun->overheated)
   {
+    // Generate Smoke particles
     vec3 initSpeed = ScalarMult(Normalize(gun->direction), 2);
-    vec4 targetColor = {0.5,0.5,0.5,0.5};
+    vec4 targetColor = {0.5,0.5,0.5,0.5}; // grey
     vec3 initPosition = {gun->position.x + initSpeed.x*0.5, gun->position.y + initSpeed.y*0.5, gun->position.z + initSpeed.z*0.5};
     initSpeed = SetVector(0,1,0);
     generateParticles(particleGen, 80, initSpeed, initPosition, 0.18f, targetColor, 0.001f, 0.2f, 1.0f);

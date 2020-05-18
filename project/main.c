@@ -28,7 +28,7 @@ LightBallHandler* lightballhandler;
 LaserHandler* laserhandler;
 FlareHandler* flarehandler;
 EnemyHandler* enemyhandler;
-ParticleGenerator* FLParticleGen;
+ParticleGenerator* LightBallParticleGen;
 ParticleGenerator* FlareParticleGen;
 CollisionHandler* collisionhandler;
 GameOverHandler* gameoverhandler;
@@ -65,7 +65,7 @@ void init(void)
 	// Particle Generator lightball
 	GLuint PGshaderID = loadShaders("shaders/particleGen1.vert", "shaders/particleGen1.frag");
 	glUseProgram(PGshaderID);
-	FLParticleGen = createParticleGenerator(100000, &PGshaderID, "textures/ParticleTextureSQUARE.tga");
+	LightBallParticleGen = createParticleGenerator(100000, &PGshaderID, "textures/ParticleTextureSQUARE.tga");
 
 	// Particle generator flare
 	glUseProgram(PGshaderID);
@@ -103,7 +103,7 @@ void display(void)
 	displayTerrain(terrain_floor, roof, user->cam, &camMatrix);
 
 	CheckLighballsCollisions (lightballhandler, terrain_floor, roof);
- 	MoveAllLightBalls(lightballhandler, &camMatrix, FLParticleGen);
+ 	MoveAllLightBalls(lightballhandler, &camMatrix, LightBallParticleGen);
  	RemoveLightBalls(lightballhandler);
 
 	CheckFlaresCollisions (flarehandler, terrain_floor, roof);
@@ -156,32 +156,14 @@ void display(void)
 	glUniform1f(glGetUniformLocation(enemyShader, "flashlightOuterCutOff"), flashlight->outerCutOff);
 	// Upload on or off
 	glUniform1i(glGetUniformLocation(enemyShader, "toggleFlashLight"), user->toggleFlashLight);
-
-
-
-
-
-
-
-
-	//printf("innercutoff %f\n", flashlight->cutOffAngle);
-  //printf("outercutoff %f\n", flashlight->outerCutOff);
-	//scale = S(1,1,1);
-	//trans = T(laser->position.x, laser->position.y, laser->position.z);
-	//trans = T(gun->position.x + gun->direction.x, gun->position.y + gun->direction.y, gun->position.z + gun->direction.z);
-	//rot = Rz(M_PI/2);
-	//tot = Mult(trans,scale);
-	//displayLaser(laser, &camMatrix, tot, rot, projectionMatrix);
 	printError("display 2");
 
-	// Particles, generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
-	glUseProgram(FLParticleGen->shaderID);
-	//vec3 initSpeed = ScalarMult(Normalize(VectorSub(user->cam, user->lookAtPoint)), 0.0005);
-	//vec4 initColor = {1,0,0,0.5};
-	//generateParticles(FLParticleGen, 1000, initSpeed, flashlight->position, initColor, 0.1f, 0.3f, 1.0f);
+	// Particles are generated in each handler
+	glUseProgram(LightBallParticleGen->shaderID);
+
 	// Lightball particles
-	simulateAllParticles(FLParticleGen, user, 1);
-	drawAllParticles(FLParticleGen, &camMatrix, projectionMatrix);
+	simulateAllParticles(LightBallParticleGen, user, 1);
+	drawAllParticles(LightBallParticleGen, &camMatrix, projectionMatrix);
 
 	// Flare particles
 	simulateAllParticles(FlareParticleGen, user, 1);
