@@ -11,27 +11,21 @@
 typedef struct
 {
   int maxNrParticles;
-  // Holds current nr of particles
-  int particlesCount;
-  // Vertices for each particle.
-  GLfloat gVertexBuffer[12];
-  GLuint billboardVertexBuffer;
-  GLuint particlesPositionBuffer;
-  GLuint particlesColorBuffer;
+  int particlesCount; // Current nr of particles
+  GLfloat particleVertices[12]; // 4 vertices for each particle.
+  GLuint billboardVertexBuffer; // Buffer for quad/billboard of vertices. Can be thought of as the billboard object
+  GLuint particlesPositionBuffer; // Buffer for World positions of particle to be drawn, updated with particlePositionSizeData array below.
+  GLuint particlesColorBuffer; // Buffer for Colors of particle to be drawn, updated with particleColorData array below.
 
-  GLfloat* particlePositionSizeData;
-  GLfloat* particleColorData;
-  Particle* particlesContainer;
+  GLfloat* particlePositionSizeData; // Position and size array that is updated from each particlestruct
+  GLfloat* particleColorData; // Color array that is updated from each particlestruct
+  Particle* particlesContainer; // Holds maxNrParticles amount of particles to be used
 
-  int lastUsedParticleIndex;
-
-  GLfloat lastTimeDrawCall;
-
-  GLfloat deltaTime;
-
-  GLuint shaderID;
-
-  GLuint particleTexture;
+  int lastUsedParticleIndex; // Used to faster iteration through particlesContainer when finding a Unused Particle
+  GLfloat lastTimeDrawCall; // Helps to calculate deltaTime
+  GLfloat deltaTime; // Is used for movement, colorchange etc.
+  GLuint shaderID; // Shader ID for particlegenerator
+  GLuint particleTexture; // The texture all particles have for this particle generator
 
 } ParticleGenerator;
 
@@ -40,7 +34,7 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
 ParticleGenerator* createParticleGenerator(int maxNrParticles, GLuint* shaderID, char* textureFile);
 void delete_ParticleGeneratorData(ParticleGenerator* particleGen);
 
-void initParticleVertexBuffer(GLfloat* vertexbuffer);
+void initParticleVertices(GLfloat* vertexbuffer);
 void initBillboardVertexBuffer(GLuint* billboardVertexBuffer, GLfloat* vertexbuffer);
 void initParticlePostitionsBuffer(GLuint* particlesPositionBuffer, int maxNrParticles);
 void initParticleColorBuffer(GLuint* particlesColorBuffer, int maxNrParticles);
@@ -56,7 +50,11 @@ void sortParticlesByCameraDistance(Particle* particlesContainer, int size);
 int findUnusedParticleIndex(ParticleGenerator* particleGen);
 
 // Set particlesPerSec to 10000. Particle spread to 1.5f. And tweak values from there.
-void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, GLfloat radius, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds);
+
+void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed,
+                        vec3 initialPostition, GLfloat radius, vec4 targetColor, float particleSpread,
+                        GLfloat initialSize, GLfloat initialLifeInSeconds);
+
 void simulateAllParticles(ParticleGenerator* particleGen, User* user, int gravityOn);
 void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 projectionMatrix);
 

@@ -1,8 +1,5 @@
 #include "ParticleGenerator.h"
 
-
-
-
 void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles, GLuint* shaderID, char* textureFile)
 {
 
@@ -10,14 +7,14 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
   glUseProgram(particleGen->shaderID);
   particleGen->maxNrParticles = maxNrParticles;
   particleGen->particlesCount = 0;
-  initParticleVertexBuffer(particleGen->gVertexBuffer);
-  initBillboardVertexBuffer(&particleGen->billboardVertexBuffer, particleGen->gVertexBuffer);
+  initParticleVertices(particleGen->particleVertices);
+  initBillboardVertexBuffer(&particleGen->billboardVertexBuffer, particleGen->particleVertices);
   initParticlePostitionsBuffer(&particleGen->particlesPositionBuffer, particleGen->maxNrParticles);
   initParticleColorBuffer(&particleGen->particlesColorBuffer, particleGen->maxNrParticles);
 
   particleGen->particlePositionSizeData = (GLfloat* )malloc(sizeof(GLfloat) * 4 * maxNrParticles); // pos is 3 floats and size is 1 => 4
   particleGen->particleColorData = (GLfloat* )malloc(sizeof(GLfloat) * 4 * maxNrParticles); // 4 floats: rgba
-  // ###!!! SHOULD CALL CONSTRUCTOR FOR EACH PARTICLE IF INIT IS WIERD, commented below, seems not needed.
+  // Comment this and uncomment below if proper particle initialation is needed, but seems that it doesn't make a difference.
   particleGen->particlesContainer = (Particle*)malloc(sizeof(Particle) * maxNrParticles);
 /*
   vec3 initPos = {0,0,0};
@@ -32,11 +29,9 @@ void init__ParticleGenerator(ParticleGenerator* particleGen, int maxNrParticles,
   particleGen->lastUsedParticleIndex = 0;
 
   particleGen->lastTimeDrawCall = 0;
-
   particleGen->deltaTime = 0;
 
   LoadTGATextureSimple(textureFile, &particleGen->particleTexture);
-
   printError("Init partgen");
 }
 
@@ -54,19 +49,9 @@ void delete_ParticleGeneratorData(ParticleGenerator* particleGen)
   free(particleGen->particlePositionSizeData);
   free(particleGen->particleColorData);
   free(particleGen->particlesContainer);
-
-  /*
-  // Cleanup VBO and shader
-	glDeleteBuffers(1, &particles_color_buffer);
-	glDeleteBuffers(1, &particles_position_buffer);
-	glDeleteBuffers(1, &billboard_vertex_buffer);
-	glDeleteProgram(programID);
-	glDeleteTextures(1, &Texture);
-	glDeleteVertexArrays(1, &VertexArrayID);
-  */
 }
 
-void initParticleVertexBuffer(GLfloat* vertexbuffer)
+void initParticleVertices(GLfloat* vertexbuffer)
 {
   //1
   vertexbuffer[0] = -0.5f;
@@ -89,6 +74,7 @@ void initParticleVertexBuffer(GLfloat* vertexbuffer)
 
 
 // ---- Initializers -------------------
+// Init quad/billboard buffer this is always the same and does not need update
 void initBillboardVertexBuffer(GLuint* billboardVertexBuffer, GLfloat* vertexbuffer)
 {
   glGenBuffers(1, billboardVertexBuffer);
@@ -102,7 +88,7 @@ void initParticlePostitionsBuffer(GLuint* particlesPositionBuffer, int maxNrPart
 {
   glGenBuffers(1, particlesPositionBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, *particlesPositionBuffer);
-  // Initialize sizes with empty (NULL) buffer : it will be updated later, each frame.
+  // Initialize position and sizes with empty buffer, update later on each frame.
   glBufferData(GL_ARRAY_BUFFER, maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 }
 
@@ -110,7 +96,7 @@ void initParticleColorBuffer(GLuint* particlesColorBuffer, int maxNrParticles)
 {
   glGenBuffers(1, particlesColorBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, *particlesColorBuffer);
-  // Initialize colors with empty (NULL) buffer : it will be updated later, each frame.
+  // Initialize colors with empty buffer, update later on each frame.
   glBufferData(GL_ARRAY_BUFFER, maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 }
 
@@ -118,14 +104,14 @@ void initParticleColorBuffer(GLuint* particlesColorBuffer, int maxNrParticles)
 void updateParticleSizePositionBuffer(ParticleGenerator* particleGen)
 {
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesPositionBuffer);
-  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, particleGen->particlesCount * sizeof(GLfloat) * 4, particleGen->particlePositionSizeData);
 }
 
 void updateParticleColorBuffer(ParticleGenerator* particleGen)
 {
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesColorBuffer);
-  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+  glBufferData(GL_ARRAY_BUFFER, particleGen->maxNrParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, particleGen->particlesCount * sizeof(GLfloat) * 4, particleGen->particleColorData);
 }
 
@@ -136,10 +122,10 @@ void bindBillboardVertexBuffer(ParticleGenerator* particleGen)
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->billboardVertexBuffer);
   glVertexAttribPointer(
-    0, // attribute. No particular reason for 0, but must match the layout in the shader.
-    3, // size
+    0, // match this in shader
+    3, // size 4 vertices, 3 floats each
     GL_FLOAT, // type
-    GL_FALSE, // normalized?
+    GL_FALSE, // normalized
     0, // stride
     (void*)0 // array buffer offset
     );
@@ -154,7 +140,7 @@ void bindParticlesPostitionBuffer(ParticleGenerator* particleGen)
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesPositionBuffer);
   glVertexAttribPointer
   (
-    1, // attribute. No particular reason for 1, but must match the layout in the shader.
+    1, // match this in shader
     4, // size : x + y + z + size => 4
     GL_FLOAT, // type
     GL_FALSE, // normalized?
@@ -171,7 +157,7 @@ void bindParticlesColorBuffer(ParticleGenerator* particleGen)
   glBindBuffer(GL_ARRAY_BUFFER, particleGen->particlesColorBuffer);
   glVertexAttribPointer
   (
-    2, // attribute. No particular reason for 1, but must match the layout in the shader.
+    2, // match this in shader
     4, // size : r + g + b + a => 4
     GL_FLOAT, // type
     GL_FALSE,
@@ -182,6 +168,7 @@ void bindParticlesColorBuffer(ParticleGenerator* particleGen)
 }
 
 // ---- Rendering -----------
+// Help function for sorting array regarding to cameraDistance
 int compare(const void* p1, const void* p2)
 {
   Particle* particle1 = ((Particle*)p1);
@@ -210,6 +197,7 @@ void sortParticlesByCameraDistance(Particle* particlesContainer, int size)
 // This should most often return emediatly
 int findUnusedParticleIndex(ParticleGenerator* particleGen)
 {
+  // Begin from last used particle
   for(int i = particleGen->lastUsedParticleIndex; i < particleGen->maxNrParticles; i++)
   {
 		if (particleGen->particlesContainer[i].life <= 0)
@@ -218,19 +206,22 @@ int findUnusedParticleIndex(ParticleGenerator* particleGen)
 			return i;
 		}
 	}
-
+  // Otherwise start from beginning
 	for(int i = 0; i < particleGen->lastUsedParticleIndex; i++){
 		if (particleGen->particlesContainer[i].life <= 0){
 			particleGen->lastUsedParticleIndex = i;
 			return i;
 		}
 	}
+  particleGen->lastUsedParticleIndex = 0;
 	return 0; // All particles are taken, override the first one
 }
 
-void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed, vec3 initialPostition, GLfloat radius, vec4 initialColor, float particleSpread, GLfloat initialSize, GLfloat initialLifeInSeconds)
+void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3 initialSpeed,
+  vec3 initialPostition, GLfloat radius, vec4 targetColor, float particleSpread,
+  GLfloat initialSize, GLfloat initialLifeInSeconds)
 {
-  // Delta in ms
+  // Delta will be in ms
   GLfloat currentTime = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
   //printf("currenttime %f\n", currentTime);
   if (particleGen->lastTimeDrawCall == 0)
@@ -241,7 +232,7 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
   }
   else
   {
-    // Calc difference
+    // Calc. difference
     particleGen->deltaTime = currentTime - particleGen->lastTimeDrawCall;
     particleGen->lastTimeDrawCall = currentTime;
   }
@@ -254,20 +245,21 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
 
   // How many particles to Generate. Delta/1000 to get seconds
   int nrNewParticles = (int)((particleGen->deltaTime / 1000) * particlesPerSec);
+
   //printf("New particles %d\n", nrNewParticles);
   // Create all particles
   for (int i = 0; i < nrNewParticles; i++)
   {
-    // Get unused particle and reset life if dead.
+    // Get unused particle
     int particleIndex = findUnusedParticleIndex(particleGen);
 
-    //ADD BOUND min life
+    //Should add bound to min life
     particleGen->particlesContainer[particleIndex].life = initialLifeInSeconds;
 
     // Set position to provided(i.e if spawned on moving object).
     //particleGen->particlesContainer[particleIndex].position = initialPostition;
+
     // Spawn on a sphere around init position with radius radius.
-    //GLfloat radius = 1.1f;
     GLfloat theta = (rand() % 180) * (M_PI / 180);
     GLfloat phi = (rand() % 360) * (M_PI / 180);
 
@@ -284,16 +276,13 @@ void generateParticles(ParticleGenerator* particleGen, int particlesPerSec, vec3
     particleGen->particlesContainer[particleIndex].velocity = VectorAdd(initialSpeed, ScalarMult(speedDir, particleSpread));
 
     //Set color to initcolor
-    particleGen->particlesContainer[particleIndex].targetColor = initialColor;
+    particleGen->particlesContainer[particleIndex].targetColor = targetColor;
     vec4 white = {1,1,1,0};
     particleGen->particlesContainer[particleIndex].color = white;
 
     // Set size
     particleGen->particlesContainer[particleIndex].size = initialSize;
-
-
   }
-
 }
 
 
@@ -302,35 +291,34 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user, int gravit
   particleGen->particlesCount = 0;
   for (int i = 0; i < particleGen->maxNrParticles; i++)
   {
-    // Extract curr particle
+    // Extract current  particle
     Particle* p = &particleGen->particlesContainer[i];
-    //printf("LIFE %f\n", p->life);
+
     if (p->life > 0)
     {
+      // Particle is alive
 
-
-    // Decrease life, tweak later
-    //printf("life before %f\n", p->life);
-    p->life -= particleGen->deltaTime * 0.001;
-    //printf("Deltatime %f\n", particleGen->deltaTime);
-    //printf("life after %f\n", p->life);
+      // Decrease life, tweak later
+      p->life -= particleGen->deltaTime * 0.001;
 
       // Only simulate if alive.
       if (p->life > 0)
       {
-        //printf("life second if %f\n", p->life);
-        // -- Update data arrays
+        // -- Update data arrays that will be loaded to buffer.
         // Simple break sim.
         vec3 retardation = {-p->velocity.x * 1.4, -p->velocity.y * 1.4, -p->velocity.z * 1.4};
+        // Update velocity
         p->velocity = VectorAdd(p->velocity, ScalarMult(retardation, (float)(particleGen->deltaTime * 0.001f * 0.2)));
 
         if (gravityOn != 0)
         {
           // Simple gravity sim.
           vec3 gravity = {0.0f,-9.81f, 0.0f};
-          p->velocity = VectorAdd(p->velocity, ScalarMult(gravity, (float)(particleGen->deltaTime * 0.001f * 0.2f))); // Last digit is weight in kilos
+          // Update velocity
+          p->velocity = VectorAdd(p->velocity, ScalarMult(gravity, (float)(particleGen->deltaTime * 0.001f * 0.2f))); // Last digit is weight
         }
 
+        // Update particle position
   			p->position = VectorAdd(p->position, ScalarMult(p->velocity, (float)(particleGen->deltaTime * 0.001f)));
 
         // Calculate distance to camera
@@ -343,7 +331,6 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user, int gravit
         {
            p->size = 0.0000001;
         }
-        // ADD BOUND
 
         // Add particle data to position and size data array
         particleGen->particlePositionSizeData[4 * particleGen->particlesCount + 0] = p->position.x;
@@ -355,45 +342,28 @@ void simulateAllParticles(ParticleGenerator* particleGen, User* user, int gravit
         particleGen->particleColorData[4 * particleGen->particlesCount + 0] = p->color.x; //r
   		  particleGen->particleColorData[4 * particleGen->particlesCount + 1] = p->color.y; //g
   			particleGen->particleColorData[4 * particleGen->particlesCount + 2] = p->color.z; //b
-        // take targetcol alpha
+        // Take targetcolor alpha
   			particleGen->particleColorData[4 * particleGen->particlesCount + 3] = p->targetColor.w; //a
 
-        // Change color goes to white for now, can make opposite. Clamps in shader.
+        // Change color goes from white to targetColor, can make opposite. Clamps in shader.
         p->color.x -= (1 - p->targetColor.x)*0.05;
         p->color.y -= (1 - p->targetColor.y)*0.05;
         p->color.z -= (1 - p->targetColor.z)*0.05;
-        /*
-        p->color.x += 0.05;
-        p->color.y += 0.05;
-        p->color.z += 0.05;
-        */
 
         //Increase nr of particle to be rendered
         particleGen->particlesCount++;
 
       }
-      else //Else set cameradistance to -1 and the sortingfunction will put dead particles in the end of vector.
+      else
       {
+        //Particle just died. Set cameradistance to -1 and the sortingfunction will put dead particles in the end of vector.
         p->life = -1;
-        p->cameraDistance = -1; // sort these to end in sortingfunction
-        //printf("Particle died\n");
+        p->cameraDistance = -1;
       }
     }
   }
-  //printf("particle count %d\n", particleGen->particlesCount);
-
   // Sorts particles by cameraDistance for renderorder.
   sortParticlesByCameraDistance(particleGen->particlesContainer, particleGen->maxNrParticles);
-/*
-  for (int i = 0; i < particleGen->maxNrParticles; i++)
-  {
-    float life = particleGen->particlesContainer[i].life;
-    if (life > 0)
-    {
-      printf("particle cam dist %f\n", particleGen->particlesContainer[i].cameraDistance);
-    }
-  }
-  */
 }
 
 void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 projectionMatrix)
@@ -406,34 +376,22 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 proj
 	glUseProgram(particleGen->shaderID);
   // Update buffers for Gpu
   updateParticleSizePositionBuffer(particleGen);
-
   updateParticleColorBuffer(particleGen);
-
-
 
   printError("Update error");
 
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, particleGen->particleTexture);
-	// Set our "myTextureSampler" sampler to use Texture Unit 0
+	// Set our "particleTex" sampler to use Texture Unit 0
 	glUniform1i(glGetUniformLocation(particleGen->shaderID, "particleTex"), 0);
-
-
-  // This to face quads to camera
-  glUseProgram(particleGen->shaderID);
-  // Same as the billboards tutorial
-	glUniform3f(glGetUniformLocation(particleGen->shaderID, "CameraRightWorldSpace"), WTVMatrix.m[0], WTVMatrix.m[4], WTVMatrix.m[8]); // first colonn
-	glUniform3f(glGetUniformLocation(particleGen->shaderID, "CameraUpWorldSpace"), WTVMatrix.m[1], WTVMatrix.m[5], WTVMatrix.m[9]); // second colonn
-  glUniform3f(glGetUniformLocation(particleGen->shaderID, "CameraOutWorldSpace"), WTVMatrix.m[2], WTVMatrix.m[6], WTVMatrix.m[10]); // third colonn
-
 
 	glUniformMatrix4fv(glGetUniformLocation(particleGen->shaderID, "ProjectionMatrix"), 1, GL_TRUE, projectionMatrix.m);
   glUniformMatrix4fv(glGetUniformLocation(particleGen->shaderID, "WTVMatrix"), 1, GL_TRUE, WTVMatrix.m);
 
   printError("Uniform ERROR");
-  // Bind buffers to shader
 
+  // Bind buffers to shader
   bindBillboardVertexBuffer(particleGen);
   bindParticlesPostitionBuffer(particleGen);
   bindParticlesColorBuffer(particleGen);
@@ -442,11 +400,10 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 proj
 
   // -- Draw
   // This is for draw instanced, first arg is id (see bind functions above)
-  //Second is how many times repeated per particle
-
-  glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
-	glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
-	glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
+  //Second argument is how many times bufferobject is repeated per quad
+  glVertexAttribDivisor(0, 0); // particles vertices - always reuse the same 4 vertices
+	glVertexAttribDivisor(1, 1); // positions and size - one per quad
+	glVertexAttribDivisor(2, 1); // color - one per quad
 
   // Draw function
   glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleGen->particlesCount);
@@ -454,6 +411,8 @@ void drawAllParticles(ParticleGenerator* particleGen, mat4* camMatrix, mat4 proj
   glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+
+  // Disable transparancy
   glDisable(GL_BLEND);
 
 }

@@ -10,7 +10,6 @@ void init__Particle(Particle* particle, vec3 position, vec3 velocity, vec4 color
   particle->color = white;
   particle->targetColor = color;
   particle->life = life;
-  particle->constLife = life;
   particle->size = size;
 }
 
@@ -21,14 +20,4 @@ Particle* createParticle(vec3 position, vec3 velocity, vec4 color, GLfloat life,
   init__Particle(result, position, velocity, color, life, size);
 
   return result;
-}
-
-void delete__ParticleData(Particle* particle)
-{
-  // add pointers if needed. Don't use pointers in this class because have to call delete in particlegen destructor.
-}
-
-void resetParticleLife(Particle particle)
-{
-  particle.life = particle.constLife;
 }
